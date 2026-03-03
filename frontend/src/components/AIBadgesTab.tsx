@@ -20,7 +20,7 @@ interface AIBadgesTabProps {
 }
 
 const AIBadgesTab = ({
-  uiSlotSelectorId = 'ai-badges',
+  uiSlotSelectorId = 'authoring-resources-ai-badge-creator-modal',
   courseId = null,
   locationId = null,
 }: AIBadgesTabProps) => {
