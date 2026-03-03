@@ -13,8 +13,18 @@ import {
 } from '@openedx/paragon';
 import { services } from '@openedx/openedx-ai-extensions-ui';
 
-const AIBadgesTab = () => {
-  const contextData = services.prepareContextData({});
+interface AIBadgesTabProps {
+  uiSlotSelectorId?: string | null;
+  courseId?: string | null;
+  locationId?: string | null;
+}
+
+const AIBadgesTab = ({
+  uiSlotSelectorId = 'ai-badges',
+  courseId = null,
+  locationId = null,
+}: AIBadgesTabProps) => {
+  const contextData = services.prepareContextData({ uiSlotSelectorId, courseId, locationId });
 
   // Badge generation states
   const [isGenerating, setIsGenerating] = useState(false);
