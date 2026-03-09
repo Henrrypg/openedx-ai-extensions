@@ -91,7 +91,7 @@ const AIBadgesTab = ({ uiSlotSelectorId, courseId, locationId }: AIBadgesTabProp
                 onClick={showForm}
                 disabled={isGenerating}
               >
-                {intl.formatMessage(messages['openedx-ai-badges.badge-form.button.regenerate'])}
+                {intl.formatMessage(messages['openedx-ai-badges.badge-form.button.show-form'])}
               </Button>
             </div>
           )}

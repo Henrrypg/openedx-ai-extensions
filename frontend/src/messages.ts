@@ -245,7 +245,7 @@ const messages = defineMessages({
   'openedx-ai-badges.badge-form.button.show-form': {
     id: 'openedx-ai-badges.badge-form.button.show-form',
     defaultMessage: 'Regenerate badge',
-    description: 'Button to show the regeneration form again',
+    description: 'Button that reveals the generation form again so the user can trigger a new (re)generation',
   },
   'openedx-ai-badges.badge-preview.edition-instructions': {
     id: 'openedx-ai-badges.badge-preview.edition-instructions',

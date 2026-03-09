@@ -62,6 +62,20 @@ class BadgeOrchestrator(SessionBasedOrchestrator):
             }
 
         complete_info = self.session.metadata['complete_info']
+
+        if not complete_info.get('badge'):
+            return {
+                "error": "Previous badge definition is missing. Cannot regenerate without a prior badge.",
+                "status": "error",
+            }
+
+        skills_requested = input_data.get('skills_enabled', False) or input_data.get('skillsEnabled', False)
+        if skills_requested and not complete_info.get('skills'):
+            return {
+                "error": "Skills were requested for regeneration but no previous skills definition was found.",
+                "status": "error",
+            }
+
         input_data['previous_badge'] = complete_info.get('badge')
         input_data['previous_skills'] = complete_info.get('skills')
 
@@ -71,7 +85,7 @@ class BadgeOrchestrator(SessionBasedOrchestrator):
 
         complete_info = {}
         complete_info['course_context'] = course_context
-        if input_data.get('skills_enabled', False) or input_data.get('skillsEnabled', False):
+        if skills_requested:
             skills = self._get_skills(course_context, input_data, regenerate=True)
             if isinstance(skills, dict) and 'error' in skills:
                 return skills
