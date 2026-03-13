@@ -1,6 +1,23 @@
 import { defineMessages } from '@edx/frontend-platform/i18n';
 
 const messages = defineMessages({
+  // AIRequestBadgesComponent messages
+  'ai.extensions.request.default.message': {
+    id: 'ai.extensions.request.default.message',
+    defaultMessage: 'Generate badge suggestions with AI',
+    description: 'Default message shown in the AI request component',
+  },
+  'ai.extensions.request.default.button': {
+    id: 'ai.extensions.request.default.button',
+    defaultMessage: 'Ask AI',
+    description: 'Default button text in the AI request component',
+  },
+  'ai.extensions.request.analyzing': {
+    id: 'ai.extensions.request.analyzing',
+    defaultMessage: 'Analyzing...',
+    description: 'Loading message shown while AI is processing',
+  },
+
   // Badge Form options labels
   'openedx-ai-badges.badge-form.selectable.aria-label': {
     id: 'openedx-ai-badges.badge-form.selectable.aria-label',

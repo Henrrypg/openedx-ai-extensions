@@ -1,7 +1,7 @@
 import { useIntl } from '@edx/frontend-platform/i18n';
 import { Button, Spinner } from '@openedx/paragon';
 import { Send } from '@openedx/paragon/icons';
-import messages from '@openedx/openedx-ai-extensions-ui/messages';
+import messages from '../messages';
 
 /**
  * AI Request Component
