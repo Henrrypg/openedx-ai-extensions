@@ -43,7 +43,7 @@ const AIBadgesTab = ({ uiSlotSelectorId, courseId, locationId }: AIBadgesTabProp
     generatedBadge,
     handleGenerate,
     handleSave,
-  } = useBadgeGeneration(uiSlotSelectorId, courseId, locationId);
+  } = useBadgeGeneration(courseId, uiSlotSelectorId, locationId);
   const hasGeneratedBadge = Boolean(generatedBadge);
 
   // Automatically hide the form once a badge is successfully generated

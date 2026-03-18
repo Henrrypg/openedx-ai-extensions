@@ -66,7 +66,7 @@ const BadgeOptionsForm = ({
         })}
       </p>
       {customMessage && (
-        <p className="text-muted mb-3" style={{ fontSize: '0.75rem' }}>{customMessage}</p>
+        <p className="text-muted mb-3 small">{customMessage}</p>
       )}
 
       <Form className="badge-form">
