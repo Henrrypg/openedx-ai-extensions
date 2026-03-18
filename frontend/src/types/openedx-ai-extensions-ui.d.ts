@@ -21,6 +21,12 @@ declare module '@openedx/openedx-ai-extensions-ui' {
       locationId?: string | null;
     }) => ContextData;
     callWorkflowService: (params: WorkflowServiceParams) => Promise<WorkflowResult>;
+    fetchConfiguration: (params: {
+      contextData: ContextData;
+      configEndpoint: string | null;
+      signal?: AbortSignal | null;
+    }) => Promise<import('./badges').ProfileConfig | null>;
+    getDefaultEndpoint: (endpoint: string) => string;
   };
 
   interface ComponentRegistration {

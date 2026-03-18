@@ -70,6 +70,19 @@ export interface GeneratedBadge {
 /** Workflow actions supported by the badge generation flow. */
 export type BadgeWorkflowAction = 'run' | 'regenerate';
 
+/** Shape of a single UI component entry from the workflow profile. */
+export interface ProfileUiComponent {
+  component: string;
+  config: Record<string, string>;
+}
+
+/** UIComponents config returned by the profile endpoint. */
+export interface ProfileConfig {
+  request: ProfileUiComponent;
+  response: ProfileUiComponent;
+  metadata?: Record<string, any>;
+}
+
 /** Payload sent to the workflow service for badge generation. */
 export interface GeneratePayload {
   action: BadgeWorkflowAction;

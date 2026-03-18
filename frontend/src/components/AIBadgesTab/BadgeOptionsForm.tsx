@@ -22,6 +22,8 @@ interface BadgeOptionsFormProps {
   isGenerating: boolean;
   /** Error message from the last generation attempt, if any. */
   generationError: string | null;
+  /** Optional workflow-specific message from the profile actuator_config. */
+  customMessage?: string;
 }
 
 /** Ordered list of selectable fields to render. */
@@ -39,6 +41,7 @@ const BadgeOptionsForm = ({
   submitAction = 'run',
   isGenerating,
   generationError,
+  customMessage,
 }: BadgeOptionsFormProps) => {
   const intl = useIntl();
   const isRegenerate = submitAction === 'regenerate';
@@ -62,6 +65,9 @@ const BadgeOptionsForm = ({
           br: Br,
         })}
       </p>
+      {customMessage && (
+        <p className="text-muted mb-3" style={{ fontSize: '0.75rem' }}>{customMessage}</p>
+      )}
 
       <Form className="badge-form">
         {SELECTABLE_FIELDS.map((field) => (

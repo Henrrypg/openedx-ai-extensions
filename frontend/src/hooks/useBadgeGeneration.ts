@@ -1,13 +1,20 @@
-import { useState, useCallback } from 'react';
+import {
+  useState, useCallback, useEffect, useMemo,
+} from 'react';
 import { services } from '@openedx/openedx-ai-extensions-ui';
 import {
   BadgeFormData,
   GeneratedBadge,
   BadgeSectionKey,
   BadgeWorkflowAction,
+  ProfileConfig,
 } from '../types/badges';
 
 interface UseBadgeGenerationReturn {
+  /** Whether the initial profile fetch is still in flight. */
+  isLoadingProfile: boolean;
+  /** Profile config from the backend, or null if none is configured. */
+  profileConfig: ProfileConfig | null;
   /** Whether a generation or save request is in flight. */
   isGenerating: boolean;
   /** The error message from the last failed request, or null. */
@@ -25,19 +32,54 @@ interface UseBadgeGenerationReturn {
 /**
  * Custom hook that encapsulates all badge generation and saving logic.
  *
- * Centralises the duplicated workflow calls, response parsing, and
- * error handling that were previously inlined 4× in AIBadgesTab.
+ * On mount it fetches the workflow profile for the given course/location to
+ * determine whether a badge workflow is configured and to retrieve any
+ * actuator_config UIComponents settings (customMessage, buttonText, …).
  */
 export const useBadgeGeneration = (
   courseId: string | null,
   uiSlotSelectorId: string | null = 'authoring-resources-ai-badge-creator-modal',
   locationId?: string | null,
 ): UseBadgeGenerationReturn => {
-  const contextData = services.prepareContextData({ uiSlotSelectorId, courseId, locationId });
-
+  const [isLoadingProfile, setIsLoadingProfile] = useState(true);
+  const [profileConfig, setProfileConfig] = useState<ProfileConfig | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationError, setGenerationError] = useState<any>(null);
   const [generatedBadge, setGeneratedBadge] = useState<GeneratedBadge | null>(null);
+
+  const contextData = useMemo(
+    () => services.prepareContextData({ uiSlotSelectorId, courseId, locationId }),
+    [courseId, locationId, uiSlotSelectorId],
+  );
+
+  useEffect(() => {
+    const abortController = new AbortController();
+
+    const fetchProfile = async () => {
+      setIsLoadingProfile(true);
+      try {
+        const config = await services.fetchConfiguration({
+          contextData,
+          configEndpoint: services.getDefaultEndpoint('profile'),
+          signal: abortController.signal,
+        });
+        if (!abortController.signal.aborted) {
+          setProfileConfig(config as ProfileConfig | null);
+        }
+      } catch (err: any) {
+        if (!abortController.signal.aborted) {
+          setProfileConfig(null);
+        }
+      } finally {
+        if (!abortController.signal.aborted) {
+          setIsLoadingProfile(false);
+        }
+      }
+    };
+
+    fetchProfile();
+    return () => abortController.abort();
+  }, [contextData]);
 
   /**
    * Internal helper — calls the workflow service and updates state.
@@ -53,7 +95,6 @@ export const useBadgeGeneration = (
           context: contextData,
         });
 
-        // Convert backend snake_case to frontend camelCase
         setGeneratedBadge(result.response as GeneratedBadge);
       } catch (error: unknown) {
         setGenerationError(error);
@@ -89,6 +130,8 @@ export const useBadgeGeneration = (
   );
 
   return {
+    isLoadingProfile,
+    profileConfig,
     isGenerating,
     generationError,
     generatedBadge,

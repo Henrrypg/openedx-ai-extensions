@@ -20,7 +20,7 @@
         "component": "AIRequestBadgesComponent",
         "config": {
           "buttonText": "+",
-          "customMessage": "Generate a badge for this course"
+          "customMessage": "Uses the stable BadgeOrchestrator"
         }
       },
       "response": {

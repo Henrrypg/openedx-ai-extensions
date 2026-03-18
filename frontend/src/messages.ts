@@ -1,6 +1,18 @@
 import { defineMessages } from '@edx/frontend-platform/i18n';
 
 const messages = defineMessages({
+  // Profile loading / no-config states
+  'openedx-ai-badges.profile.loading': {
+    id: 'openedx-ai-badges.profile.loading',
+    defaultMessage: 'Loading badge workflow configuration…',
+    description: 'Shown while the profile endpoint is being fetched',
+  },
+  'openedx-ai-badges.profile.no-config': {
+    id: 'openedx-ai-badges.profile.no-config',
+    defaultMessage: 'No badge workflow is configured for this course.',
+    description: 'Shown when the profile endpoint returns no configuration',
+  },
+
   // Badge Form options labels
   'openedx-ai-badges.badge-form.selectable.aria-label': {
     id: 'openedx-ai-badges.badge-form.selectable.aria-label',

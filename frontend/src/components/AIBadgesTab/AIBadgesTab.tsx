@@ -5,13 +5,13 @@
  * This is a slim orchestrator that composes:
  *   - BadgeOptionsForm (left panel — form inputs)
  *   - BadgePreview (right panel — generated badge preview)
- *   - useBadgeGeneration hook (all async logic)
+ *   - useBadgeGeneration hook (all async logic, including the profile fetch)
  */
 
 import { useState, useEffect } from 'react';
 import { useIntl } from '@edx/frontend-platform/i18n';
 import {
-  Container, Row, Col, Button,
+  Container, Row, Col, Button, Spinner, Alert,
 } from '@openedx/paragon';
 import { BadgeFormData } from '../../types/badges';
 import { DEFAULT_FORM_DATA } from '../../constants/formOptions';
@@ -36,6 +36,8 @@ const AIBadgesTab = ({ uiSlotSelectorId, courseId, locationId }: AIBadgesTabProp
   const [isFormVisible, setIsFormVisible] = useState(true);
 
   const {
+    isLoadingProfile,
+    profileConfig,
     isGenerating,
     generationError,
     generatedBadge,
@@ -61,6 +63,32 @@ const AIBadgesTab = ({ uiSlotSelectorId, courseId, locationId }: AIBadgesTabProp
 
   const showForm = () => setIsFormVisible(true);
 
+  // Show spinner while the profile endpoint is being queried
+  if (isLoadingProfile) {
+    return (
+      <div className="d-flex align-items-center justify-content-center p-5">
+        <Spinner
+          animation="border"
+          variant="primary"
+          screenReaderText={intl.formatMessage(messages['openedx-ai-badges.profile.loading'])}
+        />
+      </div>
+    );
+  }
+
+  // No workflow configured for this course — nothing to render
+  if (!profileConfig) {
+    return (
+      <div className="p-4">
+        <Alert variant="info">
+          {intl.formatMessage(messages['openedx-ai-badges.profile.no-config'])}
+        </Alert>
+      </div>
+    );
+  }
+
+  const { customMessage } = profileConfig.request?.config ?? {};
+
   return (
     <Container fluid className="ai-badges-tab h-100">
       <Row className="h-100" gap={2}>
@@ -74,6 +102,7 @@ const AIBadgesTab = ({ uiSlotSelectorId, courseId, locationId }: AIBadgesTabProp
               submitAction={hasGeneratedBadge ? 'regenerate' : 'run'}
               isGenerating={isGenerating}
               generationError={generationError}
+              customMessage={customMessage}
             />
           ) : (
             <div className="edition-instructions">
