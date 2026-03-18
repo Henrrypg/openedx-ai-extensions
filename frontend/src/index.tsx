@@ -1,12 +1,7 @@
 // Import registration utilities from ai-extensions
 import { registerComponents } from '@openedx/openedx-ai-extensions-ui';
 
-import AIRequestBadgesComponent from './components/AIRequestBadgesComponent';
 import AIBadgesTab from './components/AIBadgesTab';
-
-registerComponents({
-  AIRequestBadgesComponent,
-});
 
 // Register the badge configuration tab into the AI Extensions Settings Modal.
 // The backend controls whether this tab is shown per course via the
@@ -19,6 +14,5 @@ registerComponents('settings', {
 });
 
 export {
-  AIRequestBadgesComponent,
   AIBadgesTab,
 };
