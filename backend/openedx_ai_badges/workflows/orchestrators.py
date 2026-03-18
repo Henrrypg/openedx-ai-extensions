@@ -47,6 +47,63 @@ class BadgeOrchestrator(SessionBasedOrchestrator):
             "status": "saved",
         }
 
+    def regenerate(self, input_data):
+        """
+        Regenerate the badge using the existing session metadata.
+        Args:
+            input_data: dict containing any necessary input for regeneration
+        Returns:
+            dict: Response containing the regenerated badge and status
+        """
+        if not self.session.metadata.get('complete_info'):
+            return {
+                "error": "No previous generation found to regenerate from.",
+                "status": "error",
+            }
+
+        complete_info = self.session.metadata['complete_info']
+
+        if not complete_info.get('badge'):
+            return {
+                "error": "Previous badge definition is missing. Cannot regenerate without a prior badge.",
+                "status": "error",
+            }
+
+        skills_requested = input_data.get('skills_enabled', False) or input_data.get('skillsEnabled', False)
+        if skills_requested and not complete_info.get('skills'):
+            return {
+                "error": "Skills were requested for regeneration but no previous skills definition was found.",
+                "status": "error",
+            }
+
+        input_data['previous_badge'] = complete_info.get('badge')
+        input_data['previous_skills'] = complete_info.get('skills')
+
+        course_context = self._get_course_context()
+        if isinstance(course_context, dict) and 'error' in course_context:
+            return course_context
+
+        complete_info = {}
+        complete_info['course_context'] = course_context
+        if skills_requested:
+            skills = self._get_skills(course_context, input_data, regenerate=True)
+            if isinstance(skills, dict) and 'error' in skills:
+                return skills
+            complete_info['skills'] = skills
+
+        badge = self._get_badge(complete_info, input_data, regenerate=True)
+        if isinstance(badge, dict) and 'error' in badge:
+            return badge
+        complete_info['badge'] = badge
+
+        self.session.metadata['complete_info'] = complete_info
+        self.session.save(update_fields=['metadata'])
+
+        return {
+            "response": complete_info,
+            "status": "completed",
+        }
+
     def run(self, input_data):
         """
         Execute the badge generation workflow.
@@ -100,9 +157,12 @@ class BadgeOrchestrator(SessionBasedOrchestrator):
             return {'error': course_context['error'], 'status': 'error'}
         return course_context
 
-    def _get_skills(self, course_context, input_data):
+    def _get_skills(self, course_context, input_data, regenerate=False):
         """Run SkillsProcessor and return skills or error dict."""
-        skill_processor = SkillsProcessor(self.profile.processor_config)
+        skill_processor = SkillsProcessor(
+            self.profile.processor_config,
+            regenerate=regenerate
+        )
         llm_result = skill_processor.process(
             context=json.dumps(course_context),
             input_data=json.dumps(input_data)
@@ -121,9 +181,12 @@ class BadgeOrchestrator(SessionBasedOrchestrator):
                 'status': 'error'
             }
 
-    def _get_badge(self, complete_info, input_data):
+    def _get_badge(self, complete_info, input_data, regenerate=False):
         """Run BadgeProcessor and return badge dict."""
-        badge_processor = BadgeProcessor(self.profile.processor_config)
+        badge_processor = BadgeProcessor(
+            self.profile.processor_config,
+            regenerate=regenerate
+        )
         llm_result = badge_processor.process(
             context=json.dumps(complete_info),
             input_data=json.dumps(input_data)

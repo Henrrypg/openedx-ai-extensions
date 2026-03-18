@@ -1,6 +1,11 @@
 import { useState, useCallback } from 'react';
 import { services } from '@openedx/openedx-ai-extensions-ui';
-import { BadgeFormData, GeneratedBadge, BadgeSectionKey } from '../types/badges';
+import {
+  BadgeFormData,
+  GeneratedBadge,
+  BadgeSectionKey,
+  BadgeWorkflowAction,
+} from '../types/badges';
 
 interface UseBadgeGenerationReturn {
   /** Whether a generation or save request is in flight. */
@@ -10,7 +15,7 @@ interface UseBadgeGenerationReturn {
   /** The AI-generated badge data, or null if not yet generated. */
   generatedBadge: GeneratedBadge | null;
   /** Trigger badge generation with the given form data. */
-  handleGenerate: (formData: BadgeFormData) => Promise<void>;
+  handleGenerate: (formData: BadgeFormData, action?: BadgeWorkflowAction) => Promise<void>;
   /** Save an individual section of the generated badge. */
   handleSave: (key: BadgeSectionKey, value: unknown) => Promise<void>;
   /** Locally update a badge section (e.g. from textarea edits). */
@@ -61,7 +66,7 @@ export const useBadgeGeneration = (
 
   /** Generate a new badge using the form data. */
   const handleGenerate = useCallback(
-    (formData: BadgeFormData) => callWorkflow('run', formData),
+    (formData: BadgeFormData, action: BadgeWorkflowAction = 'run') => callWorkflow(action, formData),
     [callWorkflow],
   );
 

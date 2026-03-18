@@ -1,6 +1,6 @@
 import { useIntl } from '@edx/frontend-platform/i18n';
 import { Form, StatefulButton } from '@openedx/paragon';
-import { BadgeFormData, SelectableFieldKey } from '../../types/badges';
+import { BadgeFormData, SelectableFieldKey, BadgeWorkflowAction } from '../../types/badges';
 import { FORM_OPTIONS } from '../../constants/formOptions';
 import SelectableBoxGroup from './SelectableBoxGroup';
 import messages from '../../messages';
@@ -16,6 +16,8 @@ interface BadgeOptionsFormProps {
   onChange: (field: keyof BadgeFormData, value: string | boolean) => void;
   /** Called when the user clicks "Generate Badge". */
   onGenerate: () => void;
+  /** Whether the submit action is a first-time generation or regeneration. */
+  submitAction?: BadgeWorkflowAction;
   /** Whether a generation request is in progress. */
   isGenerating: boolean;
   /** Error message from the last generation attempt, if any. */
@@ -34,10 +36,12 @@ const BadgeOptionsForm = ({
   formData,
   onChange,
   onGenerate,
+  submitAction = 'run',
   isGenerating,
   generationError,
 }: BadgeOptionsFormProps) => {
   const intl = useIntl();
+  const isRegenerate = submitAction === 'regenerate';
 
   /** Dynamic labels for each selectable field, translated via intl. */
   const fieldLabels: Record<SelectableFieldKey, string> = {
@@ -92,9 +96,15 @@ const BadgeOptionsForm = ({
             onClick={onGenerate}
             disabled={isGenerating}
             labels={{
-              default: intl.formatMessage(messages['openedx-ai-badges.badge-form.button.generate']),
-              pending: intl.formatMessage(messages['openedx-ai-badges.badge-form.generating.message']),
-              complete: intl.formatMessage(messages['openedx-ai-badges.badge-form.button.generate']),
+              default: intl.formatMessage(messages[isRegenerate
+                ? 'openedx-ai-badges.badge-form.button.regenerate'
+                : 'openedx-ai-badges.badge-form.button.generate']),
+              pending: intl.formatMessage(messages[isRegenerate
+                ? 'openedx-ai-badges.badge-form.regenerating.message'
+                : 'openedx-ai-badges.badge-form.generating.message']),
+              complete: intl.formatMessage(messages[isRegenerate
+                ? 'openedx-ai-badges.badge-form.button.regenerate'
+                : 'openedx-ai-badges.badge-form.button.generate']),
             }}
           />
         </div>

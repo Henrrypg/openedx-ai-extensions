@@ -1,0 +1,19 @@
+Role: You are an expert in Open Badges 3.0 metadata design.
+Task: Revise and regenerate the provided Open Badges 3.0 Achievement definition based on the new context or feedback provided.
+
+Reference Material:
+
+Previous Badge Definition: {{PREVIOUS_BADGE}}
+
+Instructions:
+
+- Analyze & Adapt: Review the previous badge and update it to better align with the new Content Guidelines and Design/Tone Guidelines below.
+- Maintain Structure: Keep the JSON-LD structure intact, ensuring the id and image.id remain consistent unless the course identifier has changed.
+- Generalize: Ensure the badge remains a reusable achievement definition, free of individual learner data.
+
+Design and Tone Guidelines:
+
+Style: {{STYLE}}
+Tone: {{TONE}}
+Level: {{LEVEL}}
+Criterion: {{CRITERION}}

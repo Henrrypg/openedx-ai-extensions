@@ -67,9 +67,12 @@ export interface GeneratedBadge {
   [key: string]: unknown;
 }
 
+/** Workflow actions supported by the badge generation flow. */
+export type BadgeWorkflowAction = 'run' | 'regenerate';
+
 /** Payload sent to the workflow service for badge generation. */
 export interface GeneratePayload {
-  action: 'run';
+  action: BadgeWorkflowAction;
   userInput: BadgeFormData;
 }
 

@@ -14,21 +14,25 @@ class BaseBadgeLLMProcessor(LLMProcessor):
     """Base processor for badge-related LLM tasks."""
     schema_filename = None
     prompt_filename = None
+    regenerate_prompt_filename = None
+    regenerate = False
 
-    def __init__(self, config=None, user_session=None):
+    def __init__(self, config=None, user_session=None, regenerate=False):
         """Initialize with schema and prompt files."""
         if not self.schema_filename:
             raise ValueError("schema_filename must be set in subclass")
         schema_path = Path(__file__).resolve().parent / "response_schemas" / self.schema_filename
         with open(schema_path, 'r', encoding='utf-8') as f:
             extra_params = {'response_format': json.load(f)}
+        self.regenerate = regenerate
         super().__init__(config=config, user_session=user_session, extra_params=extra_params)
 
     def load_prompt(self):
         """Load the prompt template from file."""
-        if not self.prompt_filename:
+        file = self.regenerate_prompt_filename if self.regenerate else self.prompt_filename
+        if not file:
             raise ValueError("prompt_filename must be set in subclass")
-        prompt_path = Path(__file__).resolve().parent.parent / "prompts" / self.prompt_filename
+        prompt_path = Path(__file__).resolve().parent.parent / "prompts" / file
         with open(prompt_path, "r", encoding='utf-8') as f:
             return f.read()
 
@@ -51,6 +55,7 @@ class BadgeProcessor(BaseBadgeLLMProcessor):
     """Processor for generating Open Badges 3.0 BadgeClass."""
     schema_filename = "openbadge-3.0-achievement.json"
     prompt_filename = "generate_openbadge_30.txt"
+    regenerate_prompt_filename = "regenerate_openbadge_30.txt"
 
     def generate_badgeclass(self):
         """
@@ -74,6 +79,7 @@ class SkillsProcessor(BaseBadgeLLMProcessor):
     """Processor for generating skills alignment data."""
     schema_filename = "openbadge-skills-alignment.json"
     prompt_filename = "generate_skills_alignment.txt"
+    regenerate_prompt_filename = "regenerate_skills_alignment.txt"
 
     def generate_skills(self):
         """

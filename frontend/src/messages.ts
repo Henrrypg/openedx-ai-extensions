@@ -145,10 +145,20 @@ const messages = defineMessages({
     defaultMessage: 'Generate Badge',
     description: 'Button to generate badge',
   },
+  'openedx-ai-badges.badge-form.button.regenerate': {
+    id: 'openedx-ai-badges.badge-form.button.regenerate',
+    defaultMessage: 'Regenerate badge',
+    description: 'Button to regenerate an existing badge',
+  },
   'openedx-ai-badges.badge-form.generating.message': {
     id: 'openedx-ai-badges.badge-form.generating.message',
     defaultMessage: 'Please wait while AI creates your badge',
     description: 'Message shown during generation',
+  },
+  'openedx-ai-badges.badge-form.regenerating.message': {
+    id: 'openedx-ai-badges.badge-form.regenerating.message',
+    defaultMessage: 'Please wait while AI regenerates your badge',
+    description: 'Message shown during regeneration',
   },
   'openedx-ai-badges.badge-form.error.required-field': {
     id: 'openedx-ai-badges.badge-form.error.required-field',
@@ -251,8 +261,8 @@ const messages = defineMessages({
   },
   'openedx-ai-badges.badge-form.button.show-form': {
     id: 'openedx-ai-badges.badge-form.button.show-form',
-    defaultMessage: 'Create a new badge',
-    description: 'Button to show the generation form again',
+    defaultMessage: 'Regenerate badge',
+    description: 'Button that reveals the generation form again so the user can trigger a new (re)generation',
   },
   'openedx-ai-badges.badge-preview.edition-instructions': {
     id: 'openedx-ai-badges.badge-preview.edition-instructions',
