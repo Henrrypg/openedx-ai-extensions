@@ -63,8 +63,8 @@ class MITDCCProcessor:
         logger.debug("generate_badge input_data: %s", input_data)
 
         # Switch between real API and mock here:
-        return self._mock_api_response(course_context, input_data)
-        # return self._call_api(course_context, input_data)
+        # return self._mock_api_response(course_context, input_data)
+        return self._call_api(course_context, input_data)
 
     # ------------------------------------------------------------------
     # Real API call
