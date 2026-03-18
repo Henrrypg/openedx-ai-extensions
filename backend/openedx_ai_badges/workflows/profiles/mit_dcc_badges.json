@@ -12,7 +12,7 @@
         "component": "AIRequestBadgesComponent",
         "config": {
           "buttonText": "+",
-          "customMessage": "Generate a badge via MIT DCC"
+          "customMessage": "Uses experimental mit-slm service with the MITDCCBadgeOrchestrator"
         }
       },
       "response": {
