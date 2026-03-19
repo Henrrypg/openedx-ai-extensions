@@ -57,10 +57,11 @@ export const useBadgeGeneration = (
   const [profileConfig, setProfileConfig] = useState<ProfileConfig | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
-  const [generationError, setGenerationError] = useState<any>(null);
+  const [generationError, setGenerationError] = useState<string | null>(null);
   const [generatedBadge, setGeneratedBadge] = useState<GeneratedBadge | null>(null);
 
-  const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const pollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pollingCancelledRef = useRef(false);
 
   const contextData = useMemo(
     () => services.prepareContextData({ uiSlotSelectorId, courseId, locationId }),
@@ -68,44 +69,59 @@ export const useBadgeGeneration = (
   );
 
   const stopPolling = useCallback(() => {
-    if (pollIntervalRef.current !== null) {
-      clearInterval(pollIntervalRef.current);
-      pollIntervalRef.current = null;
+    pollingCancelledRef.current = true;
+    if (pollTimeoutRef.current !== null) {
+      clearTimeout(pollTimeoutRef.current);
+      pollTimeoutRef.current = null;
     }
   }, []);
 
-  /** Poll get_run_status until the task completes, errors, or times out. */
+  /** Poll get_run_status until the task completes, errors, or times out.
+   *  Uses a self-scheduling setTimeout so no two requests are ever in-flight
+   *  simultaneously. Responses arriving after stopPolling()/unmount are
+   *  discarded via pollingCancelledRef. */
   const startPolling = useCallback(() => {
     stopPolling();
+    pollingCancelledRef.current = false;
 
-    pollIntervalRef.current = setInterval(async () => {
-      try {
-        const result = await services.callWorkflowService({
-          payload: { action: 'get_run_status', userInput: {} },
-          context: contextData,
-        });
+    const scheduleNext = () => {
+      pollTimeoutRef.current = setTimeout(async () => {
+        if (pollingCancelledRef.current) { return; }
 
-        if (result.status === 'processing') {
-          setStatusMessage(result.message ?? 'Processing...');
-        } else if (result.status === 'completed') {
+        try {
+          const result = await services.callWorkflowService({
+            payload: { action: 'get_run_status', userInput: {} },
+            context: contextData,
+          });
+
+          if (pollingCancelledRef.current) { return; }
+
+          if (result.status === 'processing') {
+            setStatusMessage(result.message ?? 'Processing...');
+            scheduleNext();
+          } else if (result.status === 'completed') {
+            stopPolling();
+            setGeneratedBadge(result.response as GeneratedBadge);
+            setStatusMessage(null);
+            setIsGenerating(false);
+          } else {
+            // 'error' or 'timeout'
+            stopPolling();
+            setGenerationError(result.error ?? 'Generation failed');
+            setStatusMessage(null);
+            setIsGenerating(false);
+          }
+        } catch (err) {
+          if (pollingCancelledRef.current) { return; }
           stopPolling();
-          setGeneratedBadge(result.response as GeneratedBadge);
-          setStatusMessage(null);
-          setIsGenerating(false);
-        } else {
-          // 'error' or 'timeout'
-          stopPolling();
-          setGenerationError(result.error ?? 'Generation failed');
+          setGenerationError(err instanceof Error ? err.message : 'An unexpected error occurred');
           setStatusMessage(null);
           setIsGenerating(false);
         }
-      } catch (err) {
-        stopPolling();
-        setGenerationError(err);
-        setStatusMessage(null);
-        setIsGenerating(false);
-      }
-    }, POLL_INTERVAL_MS);
+      }, POLL_INTERVAL_MS);
+    };
+
+    scheduleNext();
   }, [contextData, stopPolling]);
 
   // Fetch profile on mount, then check whether a task is already in flight.
@@ -183,8 +199,13 @@ export const useBadgeGeneration = (
         });
 
         if (initResult.status !== 'processing') {
-          // Unexpected: treat as immediate result.
-          setGeneratedBadge(initResult.response as GeneratedBadge);
+          // Unexpected non-processing response — handle explicitly.
+          if (initResult.status === 'error' || initResult.status === 'timeout') {
+            setGenerationError(initResult.error ?? 'Generation failed');
+          } else if (initResult.status === 'completed' && initResult.response) {
+            setGeneratedBadge(initResult.response as GeneratedBadge);
+          }
+          setStatusMessage(null);
           setIsGenerating(false);
           return;
         }
@@ -192,7 +213,7 @@ export const useBadgeGeneration = (
         setStatusMessage(initResult.message ?? 'Processing...');
         startPolling();
       } catch (error: unknown) {
-        setGenerationError(error);
+        setGenerationError(error instanceof Error ? error.message : 'An unexpected error occurred');
         setStatusMessage(null);
         setIsGenerating(false);
       }
@@ -220,7 +241,7 @@ export const useBadgeGeneration = (
         });
         setGeneratedBadge(result.response as GeneratedBadge);
       } catch (error: unknown) {
-        setGenerationError(error);
+        setGenerationError(error instanceof Error ? error.message : 'An unexpected error occurred');
       }
     },
     [contextData],
