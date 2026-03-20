@@ -18,19 +18,21 @@ const STATUS_COLORS: Record<ApiServiceStatus, string> = {
   online: 'text-success',
   unavailable: 'text-danger',
   not_configured: 'text-muted',
+  starting: 'text-warning',
 };
 
 const SERVICE_LABELS: Record<string, string> = {
   badge_api: 'openedx-ai-badges.api-status.service.badge-api',
   ollama: 'openedx-ai-badges.api-status.service.ollama',
-  image_api: 'openedx-ai-badges.api-status.service.image-api',
-  laiser_api: 'openedx-ai-badges.api-status.service.laiser-api',
+  // image_api: 'openedx-ai-badges.api-status.service.image-api',   // planned for future PR
+  // laiser_api: 'openedx-ai-badges.api-status.service.laiser-api', // planned for future PR
 };
 
 const STATUS_LABELS: Record<ApiServiceStatus, string> = {
   online: 'openedx-ai-badges.api-status.online',
   unavailable: 'openedx-ai-badges.api-status.unavailable',
   not_configured: 'openedx-ai-badges.api-status.not-configured',
+  starting: 'openedx-ai-badges.api-status.starting',
 };
 
 /** Semaphore dot: green when all required services are online, yellow otherwise. */

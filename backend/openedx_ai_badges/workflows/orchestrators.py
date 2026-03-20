@@ -325,8 +325,8 @@ class MITDCCBadgeOrchestrator(BadgeOrchestrator):
             'services': {
                 'badge_api': {'status': badge_api_status, 'required': True},
                 'ollama': {'status': ollama_status, 'required': True},
-                'image_api': {'status': 'not_configured', 'required': False},
-                'laiser_api': {'status': 'not_configured', 'required': False},
+                # 'image_api': {'status': 'not_configured', 'required': False},  # planned for future PR
+                # 'laiser_api': {'status': 'not_configured', 'required': False},  # planned for future PR
             }
         }
 

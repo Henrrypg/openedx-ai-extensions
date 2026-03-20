@@ -102,7 +102,7 @@ export interface SavePayload {
 export type WorkflowPayload = GeneratePayload | SavePayload;
 
 /** Possible status values for an external API service. */
-export type ApiServiceStatus = 'online' | 'unavailable' | 'not_configured';
+export type ApiServiceStatus = 'online' | 'unavailable' | 'not_configured' | 'starting';
 
 /** Status and requirement flag for a single external service. */
 export interface ApiService {

@@ -286,6 +286,11 @@ const messages = defineMessages({
     defaultMessage: 'Not configured',
     description: 'Status label when a service is not configured',
   },
+  'openedx-ai-badges.api-status.starting': {
+    id: 'openedx-ai-badges.api-status.starting',
+    defaultMessage: 'Starting',
+    description: 'Status label when a service is warming up (e.g. Ollama loading a model)',
+  },
   'openedx-ai-badges.api-status.services-offline': {
     id: 'openedx-ai-badges.api-status.services-offline',
     defaultMessage: 'Required services are offline. Badge generation is disabled.',
@@ -306,16 +311,17 @@ const messages = defineMessages({
     defaultMessage: 'Ollama Model',
     description: 'Display name for the Ollama model service',
   },
-  'openedx-ai-badges.api-status.service.image-api': {
-    id: 'openedx-ai-badges.api-status.service.image-api',
-    defaultMessage: 'Image Generation API',
-    description: 'Display name for the image generation API service',
-  },
-  'openedx-ai-badges.api-status.service.laiser-api': {
-    id: 'openedx-ai-badges.api-status.service.laiser-api',
-    defaultMessage: 'LAISER API',
-    description: 'Display name for the LAISER API service',
-  },
+  // Planned for future PR:
+  // 'openedx-ai-badges.api-status.service.image-api': {
+  //   id: 'openedx-ai-badges.api-status.service.image-api',
+  //   defaultMessage: 'Image Generation API',
+  //   description: 'Display name for the image generation API service',
+  // },
+  // 'openedx-ai-badges.api-status.service.laiser-api': {
+  //   id: 'openedx-ai-badges.api-status.service.laiser-api',
+  //   defaultMessage: 'LAiSER API',
+  //   description: 'Display name for the LAiSER skill extraction service',
+  // },
 });
 
 export default messages;
