@@ -6,7 +6,13 @@ declare module '@openedx/openedx-ai-extensions-ui' {
   }
 
   interface WorkflowResult {
-    response: unknown;
+    response?: unknown;
+    requestId?: string;
+    status?: string;
+    message?: string;
+    error?: string;
+    timestamp?: string;
+    [k: string]: any;
   }
 
   interface WorkflowServiceParams {
