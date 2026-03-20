@@ -5,7 +5,7 @@ import json
 import logging
 from pathlib import Path
 
-from openedx_ai_extensions.processors import LLMProcessor  # pylint: disable=import-error
+from openedx_ai_extensions.processors import LLMProcessor
 
 logger = logging.getLogger(__name__)
 

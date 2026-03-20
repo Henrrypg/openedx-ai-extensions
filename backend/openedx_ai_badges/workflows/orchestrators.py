@@ -8,8 +8,6 @@ from urllib.parse import urlparse
 
 import requests
 from django.conf import settings
-
-# pylint: disable=import-error
 from openedx_ai_extensions.processors import OpenEdXProcessor
 from openedx_ai_extensions.workflows.orchestrators.session_based_orchestrator import (
     SessionBasedOrchestrator,

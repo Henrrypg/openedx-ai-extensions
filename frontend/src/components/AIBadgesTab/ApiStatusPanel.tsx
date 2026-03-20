@@ -90,7 +90,9 @@ const ApiStatusPanel = ({
               />
             )}
             {/* stopPropagation prevents the click from toggling the collapsible */}
-            {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
+            {/* eslint-disable-next-line
+                jsx-a11y/click-events-have-key-events,
+                jsx-a11y/no-static-element-interactions */}
             <span onClick={(e) => e.stopPropagation()}>
               <IconButton
                 src={Refresh}
