@@ -364,3 +364,59 @@ class MITDCCBadgeOrchestrator(BadgeOrchestrator):
             "response": complete_info,
             "status": "completed",
         }
+
+    def regenerate(self, input_data):
+        """
+        Re-generate badge via the MIT DCC remote API, passing the previous
+        badge result as additional context so the model can improve on it.
+
+        Args:
+            input_data: dict containing updated user form fields
+        Returns:
+            dict: ``{"response": complete_info, "status": "completed"}``
+        """
+        if not self.session.metadata.get('complete_info'):
+            return {
+                "error": "No previous generation found to regenerate from.",
+                "status": "error",
+            }
+
+        previous_complete_info = self.session.metadata['complete_info']
+
+        if not previous_complete_info.get('badge'):
+            return {
+                "error": "Previous badge definition is missing. Cannot regenerate without a prior badge.",
+                "status": "error",
+            }
+
+        self._set_status_message("Fetching course content...")
+        course_context = self._get_course_context()
+        if isinstance(course_context, dict) and 'error' in course_context:
+            return course_context
+
+        self._set_status_message("Regenerating badge via MIT DCC API...")
+        processor = MITDCCProcessor(self.profile.processor_config)
+        api_result = processor.generate_badge(
+            course_context=course_context,
+            input_data={
+                **input_data,
+                'previous_badge': previous_complete_info.get('badge'),
+                'previous_skills': previous_complete_info.get('skills'),
+            },
+        )
+
+        if isinstance(api_result, dict) and 'error' in api_result:
+            return {**api_result, 'status': 'error'}
+
+        complete_info = {
+            'course_context': course_context,
+            **api_result,
+        }
+
+        self.session.metadata['complete_info'] = complete_info
+        self.session.save(update_fields=['metadata'])
+
+        return {
+            "response": complete_info,
+            "status": "completed",
+        }
