@@ -9,3 +9,7 @@ disable+=
     django-not-configured,
     consider-using-with,
     bad-option-value,
+
+[TYPECHECK]
+ignored-modules=
+    openedx_ai_extensions,

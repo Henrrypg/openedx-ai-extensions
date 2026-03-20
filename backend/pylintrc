@@ -355,6 +355,8 @@ generated-members =
 	name,
 	revision,
 	_meta,
+ignored-modules = 
+	openedx_ai_extensions,
 
 [VARIABLES]
 init-import = no
@@ -387,4 +389,4 @@ int-import-graph =
 [EXCEPTIONS]
 overgeneral-exceptions = builtins.Exception
 
-# 79853056a08a5009db4a6e9a8ca00c194036ac5a
+# 01d09c715ce19e4b64c3fd57834d894c29bed20a
