@@ -311,12 +311,12 @@ const messages = defineMessages({
     defaultMessage: 'Ollama Model',
     description: 'Display name for the Ollama model service',
   },
+  'openedx-ai-badges.api-status.service.image-api': {
+    id: 'openedx-ai-badges.api-status.service.image-api',
+    defaultMessage: 'Image Generation API',
+    description: 'Display name for the image generation API service',
+  },
   // Planned for future PR:
-  // 'openedx-ai-badges.api-status.service.image-api': {
-  //   id: 'openedx-ai-badges.api-status.service.image-api',
-  //   defaultMessage: 'Image Generation API',
-  //   description: 'Display name for the image generation API service',
-  // },
   // 'openedx-ai-badges.api-status.service.laiser-api': {
   //   id: 'openedx-ai-badges.api-status.service.laiser-api',
   //   defaultMessage: 'LAiSER API',

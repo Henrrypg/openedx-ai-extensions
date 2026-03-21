@@ -279,6 +279,7 @@ class MITDCCBadgeOrchestrator(BadgeOrchestrator):
         health_url = getattr(settings, 'MIT_DCC_BADGE_API_HEALTH_URL', '')
         ollama_url = getattr(settings, 'MIT_SLM_OLLAMA_URL', '')
         ollama_token = getattr(settings, 'MIT_SLM_OLLAMA_TOKEN', '')
+        image_api_health_url = getattr(settings, 'MIT_DCC_BADGE_IMAGE_API_HEALTH_URL', '')
 
         def check_badge_api():
             if not health_url:
@@ -315,17 +316,28 @@ class MITDCCBadgeOrchestrator(BadgeOrchestrator):
             except Exception:   # pylint: disable=broad-exception-caught
                 return 'unavailable'
 
-        with ThreadPoolExecutor(max_workers=2) as executor:
+        def check_image_api():
+            if not image_api_health_url:
+                return 'not_configured'
+            try:
+                resp = requests.get(image_api_health_url, timeout=5)
+                return 'online' if resp.ok else 'unavailable'
+            except Exception:   # pylint: disable=broad-exception-caught
+                return 'unavailable'
+
+        with ThreadPoolExecutor(max_workers=3) as executor:
             badge_api_future = executor.submit(check_badge_api)
             ollama_future = executor.submit(check_ollama)
+            image_api_future = executor.submit(check_image_api)
             badge_api_status = badge_api_future.result()
             ollama_status = ollama_future.result()
+            image_api_status = image_api_future.result()
 
         return {
             'services': {
                 'badge_api': {'status': badge_api_status, 'required': True},
                 'ollama': {'status': ollama_status, 'required': True},
-                # 'image_api': {'status': 'not_configured', 'required': False},  # planned for future PR
+                'image_api': {'status': image_api_status, 'required': False},
                 # 'laiser_api': {'status': 'not_configured', 'required': False},  # planned for future PR
             }
         }

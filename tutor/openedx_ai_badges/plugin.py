@@ -78,7 +78,8 @@ mit-slm:
     MODEL_NAME: "{{ MIT_SLM_MODEL_NAME }}"
     OLLAMA_AUTH_TOKEN: "{{ MIT_SLM_OLLAMA_TOKEN }}"
     OLLAMA_PRELOAD: "{{ MIT_SLM_OLLAMA_PRELOAD }}"
-{% endif %}""",
+{% if RUN_MIT_SLM_IMAGE %}    BADGE_IMAGE_SERVICE_URL: "{{ MIT_DCC_BADGE_IMAGE_API_URL }}"
+{% endif %}{% endif %}""",
         ),
         (
             "k8s-deployments",
@@ -109,7 +110,9 @@ spec:
               value: "{{ MIT_SLM_OLLAMA_TOKEN }}"
             - name: OLLAMA_PRELOAD
               value: "{{ MIT_SLM_OLLAMA_PRELOAD }}"
-          ports:
+{% if RUN_MIT_SLM_IMAGE %}            - name: BADGE_IMAGE_SERVICE_URL
+              value: "{{ MIT_DCC_BADGE_IMAGE_API_URL }}"
+{% endif %}          ports:
             - containerPort: 8000
 {% endif %}""",
         ),
@@ -128,6 +131,77 @@ spec:
   ports:
     - port: 8000
       targetPort: 8000
+{% endif %}""",
+        ),
+    ]
+)
+
+########################
+# MIT SLM Image Generation sidecar service
+# Set RUN_MIT_SLM_IMAGE=true to deploy the badge image generation service
+# alongside Open edX. It renders badge images from structured JSON configurations.
+########################
+
+hooks.Filters.CONFIG_DEFAULTS.add_items(
+    [
+        ("RUN_MIT_SLM_IMAGE", False),
+        ("MIT_SLM_IMAGE_DOCKER_IMAGE", "felipemontoya/dcc-mit-badge-image-gen-api:latest"),
+        ("MIT_DCC_BADGE_IMAGE_API_URL", "http://mit-slm-image:3001"),
+        ("MIT_DCC_BADGE_IMAGE_API_HEALTH_URL", "http://mit-slm-image:3001/badge-image/health"),
+    ]
+)
+
+hooks.Filters.ENV_PATCHES.add_items(
+    [
+        (
+            "local-docker-compose-services",
+            """{% if RUN_MIT_SLM_IMAGE %}
+mit-slm-image:
+  image: {{ MIT_SLM_IMAGE_DOCKER_IMAGE }}
+  restart: unless-stopped
+  ports:
+    - "8598:3001"
+{% endif %}""",
+        ),
+        (
+            "k8s-deployments",
+            """{% if RUN_MIT_SLM_IMAGE %}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mit-slm-image
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mit-slm-image
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: mit-slm-image
+    spec:
+      containers:
+        - name: mit-slm-image
+          image: {{ MIT_SLM_IMAGE_DOCKER_IMAGE }}
+          ports:
+            - containerPort: 3001
+{% endif %}""",
+        ),
+        (
+            "k8s-services",
+            """{% if RUN_MIT_SLM_IMAGE %}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mit-slm-image
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: mit-slm-image
+  ports:
+    - port: 3001
+      targetPort: 3001
 {% endif %}""",
         ),
     ]

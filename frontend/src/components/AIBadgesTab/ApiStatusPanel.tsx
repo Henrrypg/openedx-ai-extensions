@@ -24,7 +24,7 @@ const STATUS_COLORS: Record<ApiServiceStatus, string> = {
 const SERVICE_LABELS: Record<string, string> = {
   badge_api: 'openedx-ai-badges.api-status.service.badge-api',
   ollama: 'openedx-ai-badges.api-status.service.ollama',
-  // image_api: 'openedx-ai-badges.api-status.service.image-api',   // planned for future PR
+  image_api: 'openedx-ai-badges.api-status.service.image-api',
   // laiser_api: 'openedx-ai-badges.api-status.service.laiser-api', // planned for future PR
 };
 
