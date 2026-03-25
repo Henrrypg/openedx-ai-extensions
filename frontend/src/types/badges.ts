@@ -59,11 +59,18 @@ export interface BadgeData {
   [key: string]: unknown;
 }
 
+/** Result from the badge image generation API. */
+export interface BadgeImageResult {
+  base64: string;
+  config: Record<string, unknown>;
+}
+
 /** Shape of the AI-generated badge response. */
 export interface GeneratedBadge {
   courseContext?: CourseContext;
   skills?: SkillsData;
   badge?: BadgeData;
+  badgeImage?: BadgeImageResult;
   [key: string]: unknown;
 }
 

@@ -46,6 +46,7 @@ const AIBadgesTab = ({ uiSlotSelectorId, courseId, locationId }: AIBadgesTabProp
     generationError,
     generatedBadge,
     handleGenerate,
+    handleGenerateImage,
     handleSave,
   } = useBadgeGeneration(courseId, uiSlotSelectorId, locationId);
   const hasGeneratedBadge = Boolean(generatedBadge);
@@ -71,6 +72,16 @@ const AIBadgesTab = ({ uiSlotSelectorId, courseId, locationId }: AIBadgesTabProp
 
   const onGenerateClick = async () => {
     await handleGenerate(formData, hasGeneratedBadge ? 'regenerate' : 'run');
+  };
+
+  const onGenerateImageClick = async ({ badgeName, badgeDescription }: {
+    badgeName: string, badgeDescription: string
+  }) => {
+    await handleGenerateImage({
+      mode: 'icon_based',
+      badge_name: badgeName,
+      badge_description: badgeDescription,
+    });
   };
 
   const showForm = () => setIsFormVisible(true);
@@ -158,6 +169,7 @@ const AIBadgesTab = ({ uiSlotSelectorId, courseId, locationId }: AIBadgesTabProp
             statusMessage={statusMessage}
             generatedBadge={generatedBadge}
             onSave={handleSave}
+            onGenerateImage={onGenerateImageClick}
           />
         </Col>
       </Row>

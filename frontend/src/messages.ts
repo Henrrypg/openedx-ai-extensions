@@ -316,6 +316,21 @@ const messages = defineMessages({
     defaultMessage: 'Image Generation API',
     description: 'Display name for the image generation API service',
   },
+  'openedx-ai-badges.badge-preview.image.title': {
+    id: 'openedx-ai-badges.badge-preview.image.title',
+    defaultMessage: 'Badge Image',
+    description: 'Title for the badge image section in the preview',
+  },
+  'openedx-ai-badges.badge-preview.image.no-image': {
+    id: 'openedx-ai-badges.badge-preview.image.no-image',
+    defaultMessage: 'No image generated yet.',
+    description: 'Message shown when no badge image has been generated',
+  },
+  'openedx-ai-badges.badge-preview.image.button.generate': {
+    id: 'openedx-ai-badges.badge-preview.image.button.generate',
+    defaultMessage: 'Generate Image',
+    description: 'Button to generate a badge image',
+  },
   // Planned for future PR:
   // 'openedx-ai-badges.api-status.service.laiser-api': {
   //   id: 'openedx-ai-badges.api-status.service.laiser-api',

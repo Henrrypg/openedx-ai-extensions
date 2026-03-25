@@ -45,3 +45,50 @@ def test_get_api_status_ollama_online_when_models_list_has_entries(mock_settings
 
     assert result["services"]["badge_api"]["status"] == "online"
     assert result["services"]["ollama"]["status"] == "online"
+
+
+@patch("openedx_ai_badges.workflows.orchestrators.requests.post")
+@patch("openedx_ai_badges.workflows.orchestrators.settings")
+def test_generate_image_success(mock_settings, mock_post):
+    """Successful image generation should return base64 and config."""
+    mock_settings.MIT_DCC_BADGE_IMAGE_API_URL = "http://image.example"
+
+    # Mock response
+    mock_resp = MagicMock(ok=True)
+    mock_resp.json.return_value = {"base64": "fakebase64", "config": {"layers": []}}
+    mock_post.return_value = mock_resp
+
+    # Mock orchestrator and session
+    orchestrator = MITDCCBadgeOrchestrator(
+        profile=MagicMock(),
+        session=MagicMock(metadata={"complete_info": {"badge": {"name": "Test"}}}),
+        location_id="loc",
+        course_id="course",
+        user=MagicMock()
+    )
+
+    result = orchestrator.generate_image({
+        "mode": "icon_based",
+        "badge_name": "Test Badge",
+        "badge_description": "Test Description"
+    })
+
+    assert result["status"] == "completed"
+    assert result["response"]["base64"] == "fakebase64"
+    assert "badge_image" in orchestrator.session.metadata["complete_info"]
+    assert orchestrator.session.save.called
+
+    # Verify endpoint
+    mock_post.assert_called_once_with(
+        "http://image.example/api/v1/badge/generate-with-icon",
+        json={
+            "image_type": "icon_based",
+            "badge_name": "Test Badge",
+            "badge_description": "Test Description",
+            "institution": "",
+            "institute_url": "",
+            "image_configuration": {},
+            "scale_factor": 2.0,
+        },
+        timeout=60
+    )
