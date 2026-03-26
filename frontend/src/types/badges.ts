@@ -33,6 +33,7 @@ export interface CourseContext {
   title?: string;
   description?: string;
   shortDescription?: string;
+  overview?: string;
   [key: string]: unknown;
 }
 
@@ -100,6 +101,8 @@ export interface GeneratedBadge {
   courseContext?: CourseContext;
   generatedResponse?: GeneratedResponse;
   badgeImage?: BadgeImageResult;
+  status?: BadgeStatus;
+  versions?: BadgeVersion[];
   [key: string]: unknown;
 }
 
@@ -150,3 +153,41 @@ export interface ApiService {
 export interface ApiStatusResult {
   services: Record<string, ApiService>;
 }
+
+// ------------------------------------------------------------------
+// Multi-badge types (gallery, editor, persistence)
+// ------------------------------------------------------------------
+
+/** Draft or published status for a persisted badge. */
+export type BadgeStatus = 'draft' | 'published';
+
+/** A snapshot of a previously generated badge image. */
+export interface BadgeVersion {
+  id: string;
+  badgeImage: BadgeImageResult | null;
+  createdAt: string;
+}
+
+/**
+ * A badge entry stored in the session's ``badges[]`` array.
+ *
+ * The ``completeInfo`` field has the same shape as ``GeneratedBadge``
+ * (camelCased by the service layer).
+ */
+export interface PersistedBadge {
+  id: string;
+  status: BadgeStatus;
+  createdAt: string;
+  completeInfo: GeneratedBadge;
+  versions: BadgeVersion[];
+}
+
+/** Form data shape used by the Studio/Editor view. */
+export interface EditorFormData {
+  courseContext: CourseContext;
+  skills: SkillAlignment[];
+  badgeDescription: string;
+}
+
+/** Save action type passed to the save_badge backend action. */
+export type BadgeSaveAction = 'draft' | 'publish';
