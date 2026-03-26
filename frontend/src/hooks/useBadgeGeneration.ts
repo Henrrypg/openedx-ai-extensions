@@ -286,7 +286,34 @@ export const useBadgeGeneration = (
   /** Update a badge section locally without hitting the backend. */
   const updateBadgeSection = useCallback(
     (key: BadgeSectionKey, value: unknown) => {
-      setGeneratedBadge((prev) => (prev ? { ...prev, [key]: value } : prev));
+      setGeneratedBadge((prev) => {
+        if (!prev) { return prev; }
+        if (key === 'achievement') {
+          return {
+            ...prev,
+            generatedResponse: {
+              ...prev.generatedResponse,
+              credentialSubject: {
+                ...prev.generatedResponse?.credentialSubject,
+                achievement: value as any,
+              },
+            },
+          };
+        }
+        if (key === 'skills') {
+          return {
+            ...prev,
+            generatedResponse: {
+              ...prev.generatedResponse,
+              skills: value as any,
+            },
+          };
+        }
+        if (key === 'courseContext') {
+          return { ...prev, courseContext: value as any };
+        }
+        return prev;
+      });
     },
     [],
   );

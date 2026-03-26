@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { useIntl } from '@edx/frontend-platform/i18n';
 import { Stack, Button, Card } from '@openedx/paragon';
-import { GeneratedBadge, BadgeSectionKey } from '../../types/badges';
+import {
+  GeneratedBadge, BadgeSectionKey, BadgeData, CourseContext, SkillAlignment,
+} from '../../types/badges';
 import SectionReviewCard from './SectionReviewCard';
 import LoadingSpinner from './LoadingSpinner';
 import EmptyPreview from './EmptyPreview';
 import messages from '../../messages';
 
 const BADGE_SECTIONS: { key: BadgeSectionKey; title: { id: string; defaultMessage: string } }[] = [
-  { key: 'badge', title: messages['openedx-ai-badges.badge-preview.badge.title'] },
+  { key: 'achievement', title: messages['openedx-ai-badges.badge-preview.badge.title'] },
   { key: 'courseContext', title: messages['openedx-ai-badges.badge-preview.course-context.title'] },
   { key: 'skills', title: messages['openedx-ai-badges.badge-preview.skills.title'] },
 ];
@@ -25,6 +27,33 @@ interface BadgePreviewProps {
   /** Called when the user triggers image generation. */
   onGenerateImage: (params: { badgeName: string; badgeDescription: string }) => Promise<void>;
 }
+
+/**
+ * Extract the data for a given section key from the canonical response shape.
+ * The service layer converts snake_case API keys to camelCase, so backend
+ * `generated_response` arrives as `generatedResponse`, `course_context` as
+ * `courseContext`, etc.
+ * After a `save` action the backend writes the value at the top level of
+ * complete_info (e.g. complete_info['achievement']), which also arrives
+ * camelCased as a top-level key — fall back to those when present.
+ */
+const extractSectionData = (
+  badge: GeneratedBadge,
+  key: BadgeSectionKey,
+): BadgeData | CourseContext | SkillAlignment[] | undefined => {
+  switch (key) {
+    case 'achievement':
+      return badge.generatedResponse?.credentialSubject?.achievement
+        ?? (badge as any).achievement;
+    case 'skills':
+      return badge.generatedResponse?.skills
+        ?? (badge as any).skills;
+    case 'courseContext':
+      return badge.courseContext;
+    default:
+      return undefined;
+  }
+};
 
 /**
  * Right panel of the AIBadgesTab — shows a loading spinner, empty state,
@@ -52,15 +81,17 @@ const BadgePreview = ({
   const handleCancel = () => setEditingSection(null);
 
   const handleSave = async (key: BadgeSectionKey, value: unknown) => {
-    // value here is the modified JSON from the child component
     await onSave(key, value);
     setEditingSection(null);
   };
 
+  const achievement = generatedBadge.generatedResponse?.credentialSubject?.achievement
+    ?? (generatedBadge as any).achievement;
+
   return (
     <Stack>
       {BADGE_SECTIONS.map(({ key, title }) => {
-        const data = generatedBadge[key];
+        const data = extractSectionData(generatedBadge, key);
         if (!data) { return null; }
 
         // Focus Mode: Hide other cards if we are editing one
@@ -108,8 +139,8 @@ const BadgePreview = ({
             <Button
               variant="primary"
               onClick={() => onGenerateImage({
-                badgeName: generatedBadge.badge?.name || '',
-                badgeDescription: generatedBadge.badge?.description || '',
+                badgeName: achievement?.name || '',
+                badgeDescription: achievement?.description || '',
               })}
               disabled={isGenerating}
             >

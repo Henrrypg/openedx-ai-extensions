@@ -9,14 +9,14 @@ import {
 } from '@openedx/paragon';
 import { Edit } from '@openedx/paragon/icons';
 import {
-  BadgeSectionKey, CourseContext, SkillsData, BadgeData,
+  BadgeSectionKey, CourseContext, SkillAlignment, BadgeData,
 } from '../../types/badges';
 import messages from '../../messages';
 
 interface SectionReviewCardProps {
   sectionKey: BadgeSectionKey;
   title: string;
-  data: CourseContext | SkillsData | BadgeData;
+  data: CourseContext | SkillAlignment[] | BadgeData;
   isEditing: boolean;
   isSaving: boolean;
   onEdit: () => void;
@@ -32,10 +32,10 @@ const CourseContextView = ({ data }: { data: CourseContext }) => (
 );
 
 /** Component to render Skills alignment list. */
-const SkillsView = ({ data }: { data: SkillsData }) => (
+const SkillsView = ({ data }: { data: SkillAlignment[] }) => (
   <Stack gap={2}>
-    {data.alignment?.map((skill, index) => (
-      <div key={`${skill.targetName}-${skill.targetType}`} className={index < data.alignment.length - 1 ? 'border-bottom pb-2' : ''}>
+    {data?.map((skill, index) => (
+      <div key={`${skill.targetName}-${skill.targetType}`} className={index < data.length - 1 ? 'border-bottom pb-2' : ''}>
         <div className="d-flex justify-content-between align-items-center">
           <h5>{skill.targetName}</h5>
           <Badge>{skill.targetType}</Badge>
@@ -103,13 +103,12 @@ const SectionReviewCard = ({
   };
 
   const renderFormattedView = () => {
-    // data is guaranteed to be a valid object here (from backend/generation)
     switch (sectionKey) {
       case 'courseContext':
         return <CourseContextView data={data as CourseContext} />;
       case 'skills':
-        return <SkillsView data={data as SkillsData} />;
-      case 'badge':
+        return <SkillsView data={data as SkillAlignment[]} />;
+      case 'achievement':
         return <BadgeView data={data as BadgeData} />;
       default:
         return <pre className="small bg-light p-2">{JSON.stringify(data, null, 2)}</pre>;
@@ -117,7 +116,7 @@ const SectionReviewCard = ({
   };
 
   const getCardTitle = () => {
-    if (sectionKey === 'badge' && (data as BadgeData).name) {
+    if (sectionKey === 'achievement' && (data as BadgeData).name) {
       return <h3 className="text-primary">{`${title}: ${(data as BadgeData).name}`}</h3>;
     }
     return <h4>{title}</h4>;
