@@ -1,9 +1,15 @@
 """
 Badge Orchestrator - Generates Open Badges 3.0 BadgeClass via async Celery tasks.
+
+Session metadata stores multiple badges per session under a ``badges`` list.
+Each badge entry has an ``id``, ``status`` (draft/published), ``complete_info``
+(the generated data), and ``versions`` (image history).
 """
 import json
 import logging
+import uuid
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timezone
 from urllib.parse import urlparse
 
 import requests
@@ -25,6 +31,117 @@ class BadgeOrchestrator(SessionBasedOrchestrator):
     Orchestrator to generate Open Badges 3.0 BadgeClass
     based on course context and optional skills.
     """
+
+    # ------------------------------------------------------------------
+    # Badge list helpers
+    # ------------------------------------------------------------------
+
+    def _get_badges(self):
+        """Return the badges list from session metadata, initializing if needed."""
+        if 'badges' not in self.session.metadata:
+            self.session.metadata['badges'] = []
+        return self.session.metadata['badges']
+
+    def _find_badge(self, badge_id):
+        """Find a badge by *id*. Returns ``(index, badge_dict)`` or ``(None, None)``."""
+        for i, badge in enumerate(self._get_badges()):
+            if badge['id'] == badge_id:
+                return i, badge
+        return None, None
+
+    # ------------------------------------------------------------------
+    # CRUD actions exposed to the frontend
+    # ------------------------------------------------------------------
+
+    def get_badges(self, input_data):  # pylint: disable=unused-argument
+        """
+        Return all badges stored in the current session.
+
+        Used by the frontend to determine the initial view state:
+        - Empty list → show Empty State (no badges created yet)
+        - Non-empty → show Gallery with badge cards
+
+        Returns:
+            dict: ``{"response": [...], "status": "completed"}`` or
+                  ``{"response": [], "status": "empty"}``.
+        """
+        badges = self._get_badges()
+        if badges:
+            return {"response": badges, "status": "completed"}
+        return {"response": [], "status": "empty"}
+
+    def save_badge(self, input_data):
+        """
+        Upsert a badge entry with the given status and editor data.
+
+        Args:
+            input_data: dict with ``badge_id`` (str | None), ``status``
+                        ('draft' | 'published'), and ``editor_data``
+                        (``{course_context, skills, badge_description}``).
+        """
+        badge_id = input_data.get('badge_id')
+        status = input_data.get('status', 'draft')
+        editor_data = input_data.get('editor_data', {})
+
+        if badge_id:
+            _, badge = self._find_badge(badge_id)
+            if badge is None:
+                return {'error': f'Badge {badge_id} not found', 'status': 'error'}
+            if badge['status'] == 'published':
+                return {'error': 'Published badges cannot be edited', 'status': 'error'}
+        else:
+            badge_id = str(uuid.uuid4())
+            badge = {
+                'id': badge_id,
+                'status': 'draft',
+                'created_at': datetime.now(timezone.utc).isoformat(),
+                'complete_info': {},
+                'versions': [],
+            }
+            self._get_badges().append(badge)
+
+        # Apply editor data to complete_info
+        complete_info = badge.get('complete_info', {})
+        if 'course_context' in editor_data:
+            complete_info['course_context'] = editor_data['course_context']
+
+        generated_response = complete_info.get('generated_response', {})
+        if 'skills' in editor_data:
+            generated_response['skills'] = editor_data['skills']
+        if 'badge_description' in editor_data:
+            credential_subject = generated_response.get('credentialSubject', {})
+            achievement = credential_subject.get('achievement', {})
+            achievement['description'] = editor_data['badge_description']
+            credential_subject['achievement'] = achievement
+            generated_response['credentialSubject'] = credential_subject
+        complete_info['generated_response'] = generated_response
+
+        badge['complete_info'] = complete_info
+        badge['status'] = status
+        self.session.save(update_fields=['metadata'])
+        return {"response": badge, "status": "saved"}
+
+    def delete_draft(self, input_data):
+        """
+        Delete a draft badge by ID. Published badges cannot be deleted.
+        """
+        badge_id = input_data.get('badge_id')
+        if not badge_id:
+            return {'error': 'Missing badge_id', 'status': 'error'}
+
+        idx, badge = self._find_badge(badge_id)
+        if badge is None:
+            return {'error': f'Badge {badge_id} not found', 'status': 'error'}
+        if badge['status'] != 'draft':
+            return {'error': 'Only draft badges can be deleted', 'status': 'error'}
+
+        self._get_badges().pop(idx)
+        self.session.save(update_fields=['metadata'])
+        return {"response": None, "status": "deleted"}
+
+    # ------------------------------------------------------------------
+    # Existing actions
+    # ------------------------------------------------------------------
 
     def save(self, input_data):
         """
