@@ -14,6 +14,7 @@ interface EditPanelProps {
   badge: GeneratedBadge;
   contextData: ReturnType<typeof services.prepareContextData>;
   onBadgeChange: (badge: GeneratedBadge) => void;
+  onError?: (message: string) => void;
 }
 
 type EditorPanelProps = CreatePanelProps | EditPanelProps;
@@ -33,6 +34,7 @@ const EditorPanel = (props: EditorPanelProps) => {
       badge={props.badge}
       contextData={props.contextData}
       onChange={props.onBadgeChange}
+      onError={props.onError}
     />
   );
 };

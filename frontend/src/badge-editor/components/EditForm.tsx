@@ -15,6 +15,7 @@ interface EditFormProps {
   badge: GeneratedBadge;
   contextData: ReturnType<typeof services.prepareContextData>;
   onChange: (badge: GeneratedBadge) => void;
+  onError?: (message: string) => void;
   disabled?: boolean;
 }
 
@@ -301,11 +302,12 @@ const BadgeSection = ({
 // ─── EditForm (root) ─────────────────────────────────────────────────────────
 
 const EditForm = ({
-  badge, contextData, onChange, disabled = false,
+  badge, contextData, onChange, onError, disabled = false,
 }: EditFormProps) => {
+  const intl = useIntl();
   const { save } = useBadgeSave(contextData);
   const {
-    generate, isGenerating, statusMessage, generatedBadge,
+    generate, isGenerating, statusMessage, generatedBadge, generationError,
   } = useBadgeGenerate(contextData);
   const { isServicesReady } = useApiStatus(contextData);
   const [contextChanged, setContextChanged] = useState(false);
@@ -317,6 +319,15 @@ const EditForm = ({
       onChange(generatedBadge);
     }
   }, [generatedBadge, onChange]);
+
+  const prevGenerationError = useRef<string | null>(null);
+  useEffect(() => {
+    if (generationError && generationError !== prevGenerationError.current) {
+      prevGenerationError.current = generationError;
+      const label = intl.formatMessage(messages['openedx.ai.badges.editor.error.regenerate']);
+      onError?.(`${label} ${generationError}`);
+    }
+  }, [generationError, onError, intl]);
 
   const handleRegenerate = () => {
     const config = badge.generatedResponse?.badgeConfiguration ?? {};
@@ -337,8 +348,6 @@ const EditForm = ({
     onChange(updated);
     save.mutate({ badge: updated, status: badge.status ?? 'draft' });
   };
-
-  const intl = useIntl();
 
   return (
     <div>

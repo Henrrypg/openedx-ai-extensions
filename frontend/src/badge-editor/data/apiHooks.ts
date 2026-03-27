@@ -9,7 +9,7 @@ import {
   generateImageAsync, getImageStatus,
 } from './api';
 import { pluginId } from '../../contants';
-import { queryKey as badgesListKey } from '../../badge-list/data/apiHooks';
+import { queryKey as badgesListKey } from '../../badge-list';
 
 const API_STATUS_POLL_MS = 60_000;
 const RUN_STATUS_POLL_MS = 5_000;

@@ -15,6 +15,7 @@ interface PreviewPanelProps {
   badge?: GeneratedBadge | null;
   versions?: BadgeVersion[];
   onImageGenerated?: (image: BadgeImageResult) => void;
+  onError?: (message: string) => void;
 }
 
 const PreviewPanel = ({
@@ -22,10 +23,11 @@ const PreviewPanel = ({
   badge = null,
   versions = [],
   onImageGenerated,
+  onError,
 }: PreviewPanelProps) => {
   const intl = useIntl();
   const {
-    generateImage, isGeneratingImage, imageStatusMessage, generatedImage,
+    generateImage, isGeneratingImage, imageStatusMessage, generatedImage, imageError,
   } = useImageGenerate(contextData);
   const { isServicesReady } = useApiStatus(contextData);
 
@@ -33,6 +35,7 @@ const PreviewPanel = ({
   const [sessionImage, setSessionImage] = useState<BadgeImageResult | null>(null);
   const [localVersions, setLocalVersions] = useState<BadgeImageResult[]>([]);
   const prevGeneratedImage = useRef<BadgeImageResult | null>(generatedImage);
+  const prevImageError = useRef<string | null>(null);
 
   // Append each newly generated image to the local version history
   useEffect(() => {
@@ -44,6 +47,14 @@ const PreviewPanel = ({
       onImageGenerated?.(generatedImage);
     }
   }, [generatedImage, onImageGenerated]);
+
+  useEffect(() => {
+    if (imageError && imageError !== prevImageError.current) {
+      prevImageError.current = imageError;
+      const label = intl.formatMessage(messages['openedx.ai.badges.editor.error.image']);
+      onError?.(`${label} ${imageError}`);
+    }
+  }, [imageError, onError, intl]);
 
   const achievement = badge?.generatedResponse?.credentialSubject?.achievement;
   const canGenerateImage = !!achievement?.description;

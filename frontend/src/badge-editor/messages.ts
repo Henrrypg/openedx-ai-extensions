@@ -150,12 +150,12 @@ const messages = defineMessages({
   'openedx.ai.badges.editor.create.button.generate': {
     id: 'openedx.ai.badges.editor.create.button.generate',
     defaultMessage: 'Generate Badge',
-    description: 'Button to generate badge',
+    description: 'Button to trigger badge generation',
   },
   'openedx.ai.badges.editor.create.generating.message': {
     id: 'openedx.ai.badges.editor.create.generating.message',
     defaultMessage: 'Please wait while AI creates your badge',
-    description: 'Message shown during generation',
+    description: 'Message shown during badge generation',
   },
   'openedx.ai.badges.editor.create.error.generic': {
     id: 'openedx.ai.badges.editor.create.error.generic',
@@ -166,26 +166,32 @@ const messages = defineMessages({
   'openedx.ai.badges.editor.preview.title': {
     id: 'openedx.ai.badges.editor.preview.title',
     defaultMessage: 'Preview',
+    description: 'Heading for the badge image preview panel',
   },
   'openedx.ai.badges.editor.preview.placeholder': {
     id: 'openedx.ai.badges.editor.preview.placeholder',
     defaultMessage: 'Your badge preview will appear here',
+    description: 'Placeholder text shown before a badge image is generated',
   },
   'openedx.ai.badges.editor.preview.generating': {
     id: 'openedx.ai.badges.editor.preview.generating',
     defaultMessage: 'Generating your badge',
+    description: 'Screen reader text shown while the badge image is being generated',
   },
   'openedx.ai.badges.editor.preview.imageAlt': {
     id: 'openedx.ai.badges.editor.preview.imageAlt',
     defaultMessage: 'Badge preview',
+    description: 'Alt text for the generated badge image',
   },
   'openedx.ai.badges.editor.preview.generateImage': {
     id: 'openedx.ai.badges.editor.preview.generateImage',
     defaultMessage: 'Generate image',
+    description: 'Button label to trigger badge image generation',
   },
   'openedx.ai.badges.editor.preview.generatingImage': {
     id: 'openedx.ai.badges.editor.preview.generatingImage',
     defaultMessage: 'Generating image...',
+    description: 'Button label shown while badge image generation is in progress',
   },
 
   'openedx.ai.badges.editor.edit.title': {
@@ -201,90 +207,134 @@ const messages = defineMessages({
   'openedx.ai.badges.editor.edit.name.label': {
     id: 'openedx.ai.badges.editor.edit.name.label',
     defaultMessage: 'Badge name',
+    description: 'Label for the badge name input field',
   },
   'openedx.ai.badges.editor.edit.description.label': {
     id: 'openedx.ai.badges.editor.edit.description.label',
     defaultMessage: 'Description',
+    description: 'Label for the badge description textarea',
   },
   'openedx.ai.badges.editor.edit.criteria.label': {
     id: 'openedx.ai.badges.editor.edit.criteria.label',
     defaultMessage: 'Criteria',
+    description: 'Label for the badge criteria textarea',
   },
   'openedx.ai.badges.editor.edit.skills.label': {
     id: 'openedx.ai.badges.editor.edit.skills.label',
     defaultMessage: 'Skills',
+    description: 'Section heading for the skills list in the edit form',
   },
   'openedx.ai.badges.editor.edit.skills.empty': {
     id: 'openedx.ai.badges.editor.edit.skills.empty',
     defaultMessage: 'No skills extracted.',
+    description: 'Message shown when no skills were extracted for the badge',
   },
   'openedx.ai.badges.editor.edit.regenerate': {
     id: 'openedx.ai.badges.editor.edit.regenerate',
     defaultMessage: 'Regenerate',
+    description: 'Button label to regenerate the badge with updated context',
   },
   'openedx.ai.badges.editor.edit.regenerating': {
     id: 'openedx.ai.badges.editor.edit.regenerating',
     defaultMessage: 'Regenerating...',
+    description: 'Button label shown while badge regeneration is in progress',
   },
   'openedx.ai.badges.editor.edit.section.courseContext': {
     id: 'openedx.ai.badges.editor.edit.section.courseContext',
     defaultMessage: 'Course context',
+    description: 'Section heading for the course context JSON editor',
   },
   'openedx.ai.badges.editor.edit.section.skills': {
     id: 'openedx.ai.badges.editor.edit.section.skills',
     defaultMessage: 'Skills',
+    description: 'Section heading for the skills list within the course context section',
   },
   'openedx.ai.badges.editor.edit.section.achievement': {
     id: 'openedx.ai.badges.editor.edit.section.achievement',
     defaultMessage: 'Badge',
+    description: 'Section heading for the badge achievement fields (name, description, criteria)',
   },
   'openedx.ai.badges.editor.edit.section.textareaAria': {
     id: 'openedx.ai.badges.editor.edit.section.textareaAria',
     defaultMessage: 'Edit {section} JSON',
+    description: 'Aria label for the JSON editor textarea; {section} is replaced with the section name',
   },
   'openedx.ai.badges.editor.edit.section.save': {
     id: 'openedx.ai.badges.editor.edit.section.save',
     defaultMessage: 'Save',
+    description: 'Button label to save inline section edits',
   },
   'openedx.ai.badges.editor.edit.section.cancel': {
     id: 'openedx.ai.badges.editor.edit.section.cancel',
     defaultMessage: 'Cancel',
+    description: 'Button label to cancel inline section edits',
   },
   'openedx.ai.badges.editor.edit.section.saving': {
     id: 'openedx.ai.badges.editor.edit.section.saving',
     defaultMessage: 'Saving',
+    description: 'Button label shown while a section save is in progress',
   },
   'openedx.ai.badges.editor.edit.section.jsonError': {
     id: 'openedx.ai.badges.editor.edit.section.jsonError',
     defaultMessage: 'Invalid JSON format',
+    description: 'Validation error shown when the JSON textarea contains malformed JSON',
   },
   'openedx.ai.badges.editor.edit.criteria.heading': {
     id: 'openedx.ai.badges.editor.edit.criteria.heading',
     defaultMessage: 'Criteria',
+    description: 'Read-only heading label shown before the criteria narrative in view mode',
   },
   'openedx.ai.badges.editor.edit.section.editButton': {
     id: 'openedx.ai.badges.editor.edit.section.editButton',
     defaultMessage: 'Edit JSON',
+    description: 'Aria label / tooltip for the icon button that opens the JSON editor',
   },
+
   'openedx.ai.badges.editor.header.back': {
     id: 'openedx.ai.badges.editor.header.back',
     defaultMessage: 'Back to gallery',
+    description: 'Back navigation button in the editor header',
   },
   'openedx.ai.badges.editor.header.untitled': {
     id: 'openedx.ai.badges.editor.header.untitled',
     defaultMessage: 'New badge',
+    description: 'Placeholder title shown in the editor header when the badge has no name yet',
   },
   'openedx.ai.badges.editor.header.delete': {
     id: 'openedx.ai.badges.editor.header.delete',
     defaultMessage: 'Delete',
+    description: 'Button label to delete a draft badge',
   },
   'openedx.ai.badges.editor.header.saveDraft': {
     id: 'openedx.ai.badges.editor.header.saveDraft',
     defaultMessage: 'Save draft',
+    description: 'Button label to save the badge as a draft',
   },
   'openedx.ai.badges.editor.header.savePublish': {
     id: 'openedx.ai.badges.editor.header.savePublish',
     defaultMessage: 'Save',
+    description: 'Button label to save and publish the badge',
+  },
+
+  'openedx.ai.badges.editor.error.save': {
+    id: 'openedx.ai.badges.editor.error.save',
+    defaultMessage: 'Failed to save the badge. Please try again.',
+    description: 'Error alert shown when a save action fails',
+  },
+  'openedx.ai.badges.editor.error.delete': {
+    id: 'openedx.ai.badges.editor.error.delete',
+    defaultMessage: 'Failed to delete the badge. Please try again.',
+    description: 'Error alert shown when a delete action fails',
+  },
+  'openedx.ai.badges.editor.error.regenerate': {
+    id: 'openedx.ai.badges.editor.error.regenerate',
+    defaultMessage: 'Failed to regenerate the badge. Please try again.',
+    description: 'Error alert shown when badge regeneration fails',
+  },
+  'openedx.ai.badges.editor.error.image': {
+    id: 'openedx.ai.badges.editor.error.image',
+    defaultMessage: 'Failed to generate the badge image. Please try again.',
+    description: 'Error alert shown when badge image generation fails',
   },
 });
 
