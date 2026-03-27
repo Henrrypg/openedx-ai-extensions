@@ -42,7 +42,7 @@ const Semaphore = ({ serviceMap }: { serviceMap: Record<string, ApiService> | nu
   return (
     <span
       aria-hidden="true"
-      className={`pgn__bubble ${allRequiredOnline ? 'pgn__bubble-success': 'pgn__bubble-warning'}`}
+      className={`pgn__bubble ${allRequiredOnline ? 'pgn__bubble-success' : 'pgn__bubble-warning'}`}
     />
   );
 };
@@ -102,7 +102,7 @@ const ApiStatusPanel = ({ contextData, enabled = true }: ApiStatusPanelProps) =>
               return (
                 <li key={name} className="d-flex align-items-center justify-content-between py-1 small">
                   <div className="d-flex align-items-center">
-                    <span className={`mr-2 pgn__bubble bg-${colorClass}`} aria-hidden="true"></span>
+                    <span className={`mr-2 pgn__bubble bg-${colorClass}`} aria-hidden="true" />
                     <span>{labelKey ? intl.formatMessage(messages[labelKey]) : name}</span>
                   </div>
                   <span className={`text-${colorClass}`}>

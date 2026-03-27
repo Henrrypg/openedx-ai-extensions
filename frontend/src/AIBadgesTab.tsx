@@ -1,4 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  useCallback, useEffect, useMemo, useState,
+} from 'react';
 import { useIntl } from '@edx/frontend-platform/i18n';
 import { Container, Spinner, Alert } from '@openedx/paragon';
 import { useQueryClient } from '@tanstack/react-query';
@@ -22,7 +24,8 @@ interface AIBadgesTabProps {
 const AIBadgesTab = ({
   uiSlotSelectorId = 'authoring-resources-ai-badge-creator-modal',
   courseId,
-  locationId }: AIBadgesTabProps) => {
+  locationId,
+}: AIBadgesTabProps) => {
   const intl = useIntl();
   const [activeView, setActiveView] = useState<ActiveView>('gallery');
   const [selectedBadge, setSelectedBadge] = useState<GeneratedBadge | null>(null);

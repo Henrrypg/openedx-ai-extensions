@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { snakeCaseObject, camelCaseObject } from '@edx/frontend-platform';
+import { snakeCaseObject } from '@edx/frontend-platform';
 import { useIntl } from '@edx/frontend-platform/i18n';
 import {
   Form, Button, Icon, IconButton, Stack, StatefulButton, TransitionReplace,
@@ -31,7 +31,6 @@ interface ContextSectionProps {
   isSaving: boolean;
   disabled: boolean;
 }
-
 
 const buildContextJson = (badge: GeneratedBadge) => ({
   course_context: badge.courseContext ? snakeCaseObject(badge.courseContext) : {},
@@ -81,7 +80,7 @@ const ContextSection = ({
       const changed = JSON.stringify(parsed.course_context) !== JSON.stringify(original.course_context)
         || JSON.stringify(parsed.skills) !== JSON.stringify(original.skills)
         || JSON.stringify(parsed.badgeConfiguration) !== JSON.stringify(original.badgeConfiguration);
-      if (changed) onContextChanged();
+      if (changed) { onContextChanged(); }
       onSave(updated);
       setIsEditing(false);
     } catch {
@@ -305,7 +304,9 @@ const EditForm = ({
   badge, contextData, onChange, disabled = false,
 }: EditFormProps) => {
   const { save } = useBadgeSave(contextData);
-  const { generate, isGenerating, statusMessage, generatedBadge } = useBadgeGenerate(contextData);
+  const {
+    generate, isGenerating, statusMessage, generatedBadge,
+  } = useBadgeGenerate(contextData);
   const { isServicesReady } = useApiStatus(contextData);
   const [contextChanged, setContextChanged] = useState(false);
 

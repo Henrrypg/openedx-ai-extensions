@@ -6,7 +6,7 @@ const messages = defineMessages({
     defaultMessage: 'Set your badge preferences. The AI will automatically analyze your course content, extract the relevant skills, and draft a custom badge description.',
     description: 'Introductory description shown at the top of the create badge form',
   },
-   // Badge Form options labels
+  // Badge Form options labels
   'openedx.ai.badges.editor.create.selectable.aria-label': {
     id: 'openedx.ai.badges.editor.create.selectable.aria-label',
     defaultMessage: '{name} selection',

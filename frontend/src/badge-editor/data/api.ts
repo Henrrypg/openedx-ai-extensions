@@ -1,5 +1,7 @@
 import { services } from '@openedx/openedx-ai-extensions-ui';
-import { ApiService, ApiStatusResult, BadgeFormData, BadgeStatus, BadgeWorkflowAction, GeneratedBadge } from '../../types/badges';
+import {
+  ApiService, ApiStatusResult, BadgeFormData, BadgeStatus, BadgeWorkflowAction, GeneratedBadge,
+} from '../../types/badges';
 
 export const saveBadge = async (
   contextData: ReturnType<typeof services.prepareContextData>,
@@ -68,12 +70,18 @@ export const generateImageAsync = async (
 
 export const getImageStatus = async (
   contextData: ReturnType<typeof services.prepareContextData>,
-): Promise<{ status: string; response?: { base64: string; config: Record<string, unknown> }; message?: string; error?: string }> => {
+): Promise<{ status: string; response?: {
+  base64: string; config:
+  Record<string, unknown>
+}; message?: string; error?: string }> => {
   const result = await services.callWorkflowService({
     payload: { action: 'get_image_status', userInput: {} },
     context: contextData,
   });
-  return result as { status: string; response?: { base64: string; config: Record<string, unknown> }; message?: string; error?: string };
+  return result as { status: string; response?: {
+    base64: string;
+    config: Record<string, unknown>
+  }; message?: string; error?: string };
 };
 
 export const deleteDraft = async (

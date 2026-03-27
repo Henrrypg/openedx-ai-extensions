@@ -1,6 +1,6 @@
 import { useIntl } from '@edx/frontend-platform/i18n';
 import {
-  Card, Badge, Button, useMediaQuery, breakpoints
+  Card, Badge, Button, useMediaQuery, breakpoints,
 } from '@openedx/paragon';
 import { Edit } from '@openedx/paragon/icons';
 import { GeneratedBadge } from '../types/badges';
@@ -16,31 +16,37 @@ const fallbackSrc = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAAEsCAYAA
 const BadgeCard = ({ className, original: badge, onEdit }: BadgeCardProps) => {
   const intl = useIntl();
   const isSmall = useMediaQuery({ maxWidth: breakpoints.small.maxWidth });
-  const badgeImage = badge.badgeImage;
+  const { badgeImage } = badge;
   const name = badge.generatedResponse?.credentialSubject?.achievement?.name
     ?? intl.formatMessage(messages['openedx.ai.badges.card.untitled']);
   const description = badge.generatedResponse?.credentialSubject?.achievement?.description ?? '';
   const isDraft = badge.status === 'draft';
-  const imageSrc = badgeImage
-    ? (badgeImage.base64.startsWith('data:') ? badgeImage.base64 : `data:image/png;base64,${badgeImage.base64}`)
-    : fallbackSrc;
+  let imageSrc = fallbackSrc;
+
+  if (badgeImage) {
+    const { base64 } = badgeImage;
+    imageSrc = base64.startsWith('data:')
+      ? base64
+      : `data:image/png;base64,${base64}`;
+  }
 
   return (
-    <Card className={`badge-card ${className ?? ''}`} orientation={isSmall ? "vertical" : "horizontal"}>
+    <Card className={`badge-card ${className ?? ''}`} orientation={isSmall ? 'vertical' : 'horizontal'}>
       <Card.ImageCap
         src={imageSrc}
-
         fallbackSrc={fallbackSrc}
         srcAlt={name}
       />
       <Card.Body>
         <Card.Header
           title={name}
-          subtitle={(<Badge variant={isDraft ? 'light' : 'success'}>
-            {isDraft
-              ? intl.formatMessage(messages['openedx.ai.badges.card.status.draft'])
-              : intl.formatMessage(messages['openedx.ai.badges.card.status.published'])}
-          </Badge>)}
+          subtitle={(
+            <Badge variant={isDraft ? 'light' : 'success'}>
+              {isDraft
+                ? intl.formatMessage(messages['openedx.ai.badges.card.status.draft'])
+                : intl.formatMessage(messages['openedx.ai.badges.card.status.published'])}
+            </Badge>
+          )}
         />
         {description && (
           <Card.Section>
@@ -49,7 +55,7 @@ const BadgeCard = ({ className, original: badge, onEdit }: BadgeCardProps) => {
         )}
         <Card.Footer>
           <Button
-            size='sm'
+            size="sm"
             block
             variant="secondary"
             iconBefore={Edit}
@@ -60,7 +66,7 @@ const BadgeCard = ({ className, original: badge, onEdit }: BadgeCardProps) => {
             {intl.formatMessage(messages['openedx.ai.badges.card.edit'])}
           </Button>
         </Card.Footer>
-        </Card.Body>
+      </Card.Body>
     </Card>
   );
 };

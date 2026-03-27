@@ -81,7 +81,9 @@ const GalleryView = ({
         <DataTable.TableControlBar />
         <CardView
           CardComponent={CardWithEdit}
-          columnSizes={{ xs: 12, md: 6, lg: 6, xl: 4, }}
+          columnSizes={{
+            xs: 12, md: 6, lg: 6, xl: 4,
+          }}
         />
         <DataTable.EmptyTable
           content={intl.formatMessage(messages['openedx.ai.badges.gallery.no.results'])}

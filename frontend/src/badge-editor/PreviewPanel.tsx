@@ -150,7 +150,7 @@ const PreviewPanel = ({
           );
         })}
       </div>
-      <ApiStatusPanel contextData={contextData}/>
+      <ApiStatusPanel contextData={contextData} />
     </div>
   );
 };

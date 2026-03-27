@@ -60,28 +60,39 @@ export const useBadgeGenerate = (
     queryFn: () => getRunStatus(contextData),
     enabled: mutation.isSuccess && mutation.data?.status === 'processing',
     refetchInterval: (data) => {
-      if (!data || data.status === 'processing') return RUN_STATUS_POLL_MS;
+      if (!data || data.status === 'processing') { return RUN_STATUS_POLL_MS; }
       return false;
     },
   });
 
   const isGenerating = mutation.isLoading || polling.data?.status === 'processing';
-  const generatedBadge = polling.data?.status === 'completed' ? polling.data.response ?? null : null;
-  const statusMessage = polling.data?.message ?? (mutation.isSuccess ? mutation.data?.message ?? null : null);
-  const generationError = mutation.error instanceof Error
-    ? mutation.error.message
-    : polling.data?.status === 'error'
-      ? polling.data.error ?? 'Generation failed'
-      : null;
+  let generatedBadge: GeneratedBadge | null = null;
+  if (polling.data?.status === 'completed') {
+    generatedBadge = polling.data.response ?? null;
+  }
+
+  let statusMessage: string | null = null;
+  if (polling.data?.message) {
+    statusMessage = polling.data.message;
+  } else if (mutation.isSuccess) {
+    statusMessage = mutation.data?.message ?? null;
+  }
+
+  let generationError: string | null = null;
+  if (mutation.error instanceof Error) {
+    generationError = mutation.error.message;
+  } else if (polling.data?.status === 'error') {
+    generationError = polling.data.error ?? 'Generation failed';
+  }
 
   useEffect(() => {
-    if (!generatedBadge) return;
+    if (!generatedBadge) { return; }
     const badgeId = (generatedBadge as any).id;
     queryClient.setQueryData(
       [pluginId, 'badges-list', contextData],
       (old: GeneratedBadge[] | undefined) => {
         const list = old ?? [];
-        if (badgeId && list.some((b: any) => b.id === badgeId)) return list;
+        if (badgeId && list.some((b: any) => b.id === badgeId)) { return list; }
         return [...list, generatedBadge];
       },
     );
@@ -113,7 +124,7 @@ export const useImageGenerate = (
     queryFn: () => getImageStatus(contextData),
     enabled: mutation.isSuccess && mutation.data?.status === 'processing',
     refetchInterval: (data) => {
-      if (!data || data.status === 'processing') return IMAGE_STATUS_POLL_MS;
+      if (!data || data.status === 'processing') { return IMAGE_STATUS_POLL_MS; }
       return false;
     },
   });
@@ -138,7 +149,10 @@ export const useBadgeSave = (
   const queryClient = useQueryClient();
 
   const save = useMutation({
-    mutationFn: ({ badge, status }: { badge: GeneratedBadge; status: BadgeStatus }) => saveBadge(contextData, badge, status),
+    mutationFn: ({ badge, status }: {
+      badge: GeneratedBadge;
+      status: BadgeStatus
+    }) => saveBadge(contextData, badge, status),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [pluginId, 'badges-list'] });
     },

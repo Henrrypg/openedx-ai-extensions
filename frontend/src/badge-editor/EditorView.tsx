@@ -36,7 +36,7 @@ const EditorView = ({
   }, []);
 
   const handleSave = (status: BadgeStatus) => {
-    if (!currentBadge) return;
+    if (!currentBadge) { return; }
     const badgeToSave = lastGeneratedImage
       ? { ...currentBadge, badgeImage: lastGeneratedImage }
       : currentBadge;
@@ -45,7 +45,7 @@ const EditorView = ({
 
   const handleDeleteDraft = () => {
     const badgeId = currentBadge?.id as string | undefined;
-    if (!badgeId) return;
+    if (!badgeId) { return; }
     remove.mutate(badgeId, { onSuccess: onSaveComplete });
   };
 

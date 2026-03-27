@@ -16,7 +16,7 @@ const SkillChip = ({ skills, onChange }: SkillChipProps) => (
         overlay={<Tooltip id={`skill-tooltip-${skill.targetUrl}`}>{skill.targetDescription}</Tooltip>}
       >
         <Chip
-          className='m-2'
+          className="m-2"
           {...(onChange && {
             iconAfter: Close,
             onIconAfterClick: () => {
