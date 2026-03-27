@@ -6,12 +6,6 @@ const messages = defineMessages({
     defaultMessage: 'Set your badge preferences. The AI will automatically analyze your course content, extract the relevant skills, and draft a custom badge description.',
     description: 'Introductory description shown at the top of the create badge form',
   },
-  // Badge Form options labels
-  'openedx.ai.badges.editor.create.selectable.aria-label': {
-    id: 'openedx.ai.badges.editor.create.selectable.aria-label',
-    defaultMessage: '{name} selection',
-    description: 'Aria label for a group of selectable options',
-  },
 
   'openedx.ai.badges.editor.create.style.label': {
     id: 'openedx.ai.badges.editor.create.style.label',
@@ -158,58 +152,17 @@ const messages = defineMessages({
     defaultMessage: 'Generate Badge',
     description: 'Button to generate badge',
   },
-  'openedx.ai.badges.editor.create.button.regenerate': {
-    id: 'openedx.ai.badges.editor.create.button.regenerate',
-    defaultMessage: 'Regenerate badge',
-    description: 'Button to regenerate an existing badge',
-  },
   'openedx.ai.badges.editor.create.generating.message': {
     id: 'openedx.ai.badges.editor.create.generating.message',
     defaultMessage: 'Please wait while AI creates your badge',
     description: 'Message shown during generation',
-  },
-  'openedx.ai.badges.editor.create.regenerating.message': {
-    id: 'openedx.ai.badges.editor.create.regenerating.message',
-    defaultMessage: 'Please wait while AI regenerates your badge',
-    description: 'Message shown during regeneration',
   },
   'openedx.ai.badges.editor.create.error.generic': {
     id: 'openedx.ai.badges.editor.create.error.generic',
     defaultMessage: 'Something went wrong. Please try again later.',
     description: 'Generic error message shown on generation failure',
   },
-  'openedx.ai.badges.editor.panel.title': {
-    id: 'openedx.ai.badges.editor.panel.title',
-    defaultMessage: 'Editor',
-  },
-  'openedx.ai.badges.editor.panel.skills.label': {
-    id: 'openedx.ai.badges.editor.panel.skills.label',
-    defaultMessage: 'Extract skills',
-  },
-  'openedx.ai.badges.editor.panel.skills.description': {
-    id: 'openedx.ai.badges.editor.panel.skills.description',
-    defaultMessage: 'Automatically extract relevant skills from the course content.',
-  },
-  'openedx.ai.badges.editor.panel.additionalInstructions.label': {
-    id: 'openedx.ai.badges.editor.panel.additionalInstructions.label',
-    defaultMessage: 'Additional instructions',
-  },
-  'openedx.ai.badges.editor.panel.additionalInstructions.placeholder': {
-    id: 'openedx.ai.badges.editor.panel.additionalInstructions.placeholder',
-    defaultMessage: 'Add any extra instructions for the badge generation...',
-  },
-  'openedx.ai.badges.editor.panel.generate': {
-    id: 'openedx.ai.badges.editor.panel.generate',
-    defaultMessage: 'Generate badge',
-  },
-  'openedx.ai.badges.editor.panel.regenerate': {
-    id: 'openedx.ai.badges.editor.panel.regenerate',
-    defaultMessage: 'Regenerate badge',
-  },
-  'openedx.ai.badges.editor.panel.generating': {
-    id: 'openedx.ai.badges.editor.panel.generating',
-    defaultMessage: 'Generating',
-  },
+
   'openedx.ai.badges.editor.preview.title': {
     id: 'openedx.ai.badges.editor.preview.title',
     defaultMessage: 'Preview',
@@ -234,6 +187,7 @@ const messages = defineMessages({
     id: 'openedx.ai.badges.editor.preview.generatingImage',
     defaultMessage: 'Generating image...',
   },
+
   'openedx.ai.badges.editor.edit.title': {
     id: 'openedx.ai.badges.editor.edit.title',
     defaultMessage: 'Badge Editor',
@@ -264,14 +218,6 @@ const messages = defineMessages({
     id: 'openedx.ai.badges.editor.edit.skills.empty',
     defaultMessage: 'No skills extracted.',
   },
-  'openedx.ai.badges.editor.edit.courseDescription.label': {
-    id: 'openedx.ai.badges.editor.edit.courseDescription.label',
-    defaultMessage: 'Course description',
-  },
-  'openedx.ai.badges.editor.edit.courseDescription.help': {
-    id: 'openedx.ai.badges.editor.edit.courseDescription.help',
-    defaultMessage: 'Modify the course description used as context for badge generation.',
-  },
   'openedx.ai.badges.editor.edit.regenerate': {
     id: 'openedx.ai.badges.editor.edit.regenerate',
     defaultMessage: 'Regenerate',
@@ -291,10 +237,6 @@ const messages = defineMessages({
   'openedx.ai.badges.editor.edit.section.achievement': {
     id: 'openedx.ai.badges.editor.edit.section.achievement',
     defaultMessage: 'Badge',
-  },
-  'openedx.ai.badges.editor.edit.section.editAria': {
-    id: 'openedx.ai.badges.editor.edit.section.editAria',
-    defaultMessage: 'Edit {section}',
   },
   'openedx.ai.badges.editor.edit.section.textareaAria': {
     id: 'openedx.ai.badges.editor.edit.section.textareaAria',

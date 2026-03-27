@@ -4,7 +4,7 @@ import { GeneratedBadge } from '../../types/badges';
 import { getBadges } from './api';
 import { pluginId } from '../../contants';
 
-const queryKey = {
+export const queryKey = {
   all: [pluginId, 'badges-list'],
   list: (contextData) => [...queryKey.all, contextData],
 };

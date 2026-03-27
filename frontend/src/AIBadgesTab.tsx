@@ -6,8 +6,8 @@ import { Container, Spinner, Alert } from '@openedx/paragon';
 import { useQueryClient } from '@tanstack/react-query';
 import { services } from '@openedx/openedx-ai-extensions-ui';
 import { useProfileConfig } from './data/apiHooks';
-import { pluginId } from './contants';
 import { GalleryView } from './badge-list';
+import { queryKey as badgesListKey } from './badge-list/data/apiHooks';
 import { EditorView } from './badge-editor';
 import type { GeneratedBadge } from './types/badges';
 import messages from './messages';
@@ -38,7 +38,7 @@ const AIBadgesTab = ({
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    queryClient.invalidateQueries({ queryKey: [pluginId, 'badges-list'], exact: false });
+    queryClient.invalidateQueries({ queryKey: badgesListKey.all, exact: false });
   }, [queryClient]);
 
   const { data: profileConfig, isLoading: isLoadingProfile } = useProfileConfig(contextData);

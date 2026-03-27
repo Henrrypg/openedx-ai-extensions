@@ -9,6 +9,7 @@ import {
   generateImageAsync, getImageStatus,
 } from './api';
 import { pluginId } from '../../contants';
+import { queryKey as badgesListKey } from '../../badge-list/data/apiHooks';
 
 const API_STATUS_POLL_MS = 60_000;
 const RUN_STATUS_POLL_MS = 5_000;
@@ -89,7 +90,7 @@ export const useBadgeGenerate = (
     if (!generatedBadge) { return; }
     const badgeId = (generatedBadge as any).id;
     queryClient.setQueryData(
-      [pluginId, 'badges-list', contextData],
+      badgesListKey.list(contextData),
       (old: GeneratedBadge[] | undefined) => {
         const list = old ?? [];
         if (badgeId && list.some((b: any) => b.id === badgeId)) { return list; }
@@ -154,14 +155,14 @@ export const useBadgeSave = (
       status: BadgeStatus
     }) => saveBadge(contextData, badge, status),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [pluginId, 'badges-list'] });
+      queryClient.invalidateQueries({ queryKey: badgesListKey.list(contextData) });
     },
   });
 
   const remove = useMutation({
     mutationFn: (badgeId: string) => deleteDraft(contextData, badgeId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [pluginId, 'badges-list'] });
+      queryClient.invalidateQueries({ queryKey: badgesListKey.list(contextData) });
     },
   });
 

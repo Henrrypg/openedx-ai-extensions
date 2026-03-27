@@ -1,7 +1,7 @@
 // Import registration utilities from ai-extensions
 import { registerComponents } from '@openedx/openedx-ai-extensions-ui';
 
-import AIBadgesTab from './components/AIBadgesTab';
+import AIBadgesTab from './AIBadgesTab';
 
 // Register the badge configuration tab into the AI Extensions Settings Modal.
 // The backend controls whether this tab is shown per course via the
