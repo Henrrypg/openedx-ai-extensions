@@ -14,16 +14,17 @@ interface ApiStatusPanelProps {
 }
 
 const STATUS_COLORS: Record<ApiServiceStatus, string> = {
-  online: 'text-success',
-  unavailable: 'text-danger',
-  not_configured: 'text-muted',
-  starting: 'text-warning',
+  online: 'success',
+  unavailable: 'danger',
+  not_configured: 'gray',
+  starting: 'warning',
 };
 
 const SERVICE_LABELS: Record<string, string> = {
   badge_api: 'openedx-ai-badges.api-status.service.badge-api',
   ollama: 'openedx-ai-badges.api-status.service.ollama',
   image_api: 'openedx-ai-badges.api-status.service.image-api',
+  // laiser_api: 'openedx-ai-badges.api-status.service.laiser-api', // planned for future PR
 };
 
 const STATUS_LABELS: Record<ApiServiceStatus, string> = {
@@ -41,7 +42,7 @@ const Semaphore = ({ serviceMap }: { serviceMap: Record<string, ApiService> | nu
   return (
     <span
       aria-hidden="true"
-      className={`badge-status__semaphore ${allRequiredOnline ? 'badge-status__semaphore--ok' : 'badge-status__semaphore--warn'}`}
+      className={`pgn__bubble ${allRequiredOnline ? 'pgn__bubble-success': 'pgn__bubble-warning'}`}
     />
   );
 };
@@ -101,10 +102,10 @@ const ApiStatusPanel = ({ contextData, enabled = true }: ApiStatusPanelProps) =>
               return (
                 <li key={name} className="d-flex align-items-center justify-content-between py-1 small">
                   <div className="d-flex align-items-center">
-                    <span className={`mr-2 ${colorClass}`} aria-hidden="true">●</span>
+                    <span className={`mr-2 pgn__bubble bg-${colorClass}`} aria-hidden="true"></span>
                     <span>{labelKey ? intl.formatMessage(messages[labelKey]) : name}</span>
                   </div>
-                  <span className={colorClass}>
+                  <span className={`text-${colorClass}`}>
                     {statusKey ? intl.formatMessage(messages[statusKey]) : service.status}
                   </span>
                 </li>

@@ -6,8 +6,17 @@ export const saveBadge = async (
   badge: GeneratedBadge,
   status: BadgeStatus,
 ): Promise<GeneratedBadge> => {
+  const userInput: Record<string, unknown> = {
+    badge_id: (badge as any).id,
+    status,
+    course_context: badge.courseContext ?? {},
+    generated_response: badge.generatedResponse ?? {},
+  };
+  if (badge.badgeImage) {
+    userInput.badge_image = badge.badgeImage;
+  }
   const result = await services.callWorkflowService({
-    payload: { action: 'save_badge', userInput: { badge, status } },
+    payload: { action: 'save_badge', userInput },
     context: contextData,
   });
   return result.response as GeneratedBadge;

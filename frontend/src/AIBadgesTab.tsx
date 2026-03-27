@@ -39,7 +39,7 @@ const AIBadgesTab = ({
   }, [queryClient]);
 
   const { data: profileConfig, isLoading: isLoadingProfile } = useProfileConfig(contextData);
-
+  const customMessage = (profileConfig as any)?.request?.config?.customMessage as string | undefined;
   const onCreateNew = useCallback(() => {
     setSelectedBadge(null);
     setActiveView('editor');
@@ -89,6 +89,7 @@ const AIBadgesTab = ({
           contextData={contextData}
           onCreateNew={onCreateNew}
           onEdit={onEdit}
+          customMessage={customMessage}
         />
       )}
       {activeView === 'editor' && (

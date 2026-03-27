@@ -6,8 +6,9 @@ import {
 import { WorkspacePremium } from '@openedx/paragon/icons';
 import { services } from '@openedx/openedx-ai-extensions-ui';
 import { GeneratedBadge, BadgeImageResult, BadgeVersion } from '../types/badges';
-import { useImageGenerate } from './data/apiHooks';
+import { useImageGenerate, useApiStatus } from './data/apiHooks';
 import messages from './messages';
+import ApiStatusPanel from './components/ApiStatusPanel';
 
 interface PreviewPanelProps {
   contextData: ReturnType<typeof services.prepareContextData>;
@@ -26,8 +27,10 @@ const PreviewPanel = ({
   const {
     generateImage, isGeneratingImage, imageStatusMessage, generatedImage,
   } = useImageGenerate(contextData);
+  const { isServicesReady } = useApiStatus(contextData);
 
   const [selectedVersionImage, setSelectedVersionImage] = useState<BadgeImageResult | null>(null);
+  const [sessionImage, setSessionImage] = useState<BadgeImageResult | null>(null);
   const [localVersions, setLocalVersions] = useState<BadgeImageResult[]>([]);
   const prevGeneratedImage = useRef<BadgeImageResult | null>(generatedImage);
 
@@ -35,6 +38,7 @@ const PreviewPanel = ({
   useEffect(() => {
     if (generatedImage && generatedImage !== prevGeneratedImage.current) {
       prevGeneratedImage.current = generatedImage;
+      setSessionImage(generatedImage);
       setLocalVersions((prev) => [generatedImage, ...prev]);
       setSelectedVersionImage(null);
       onImageGenerated?.(generatedImage);
@@ -44,7 +48,7 @@ const PreviewPanel = ({
   const achievement = badge?.generatedResponse?.credentialSubject?.achievement;
   const canGenerateImage = !!achievement?.description;
 
-  const currentImage: BadgeImageResult | null = selectedVersionImage ?? generatedImage ?? badge?.badgeImage ?? null;
+  const currentImage: BadgeImageResult | null = selectedVersionImage ?? sessionImage ?? badge?.badgeImage ?? null;
 
   const handleGenerateImage = () => {
     setSelectedVersionImage(null);
@@ -67,12 +71,12 @@ const PreviewPanel = ({
 
   return (
     <div>
-      <h3 className="mb-3">
+      <h3 className="mb-3 text-primary">
         {intl.formatMessage(messages['openedx.ai.badges.editor.preview.title'])}
       </h3>
 
-      <Card className="p-3 mb-3">
-        <Card.Body className="d-flex flex-column align-items-center justify-content-center">
+      <Card className="mb-3">
+        <Card.Body className="badge-preview__image-area d-flex flex-column align-items-center justify-content-center">
           {isGeneratingImage && !currentImage && (
             <div className="d-flex flex-column align-items-center py-5">
               <Spinner
@@ -121,7 +125,7 @@ const PreviewPanel = ({
         <Button
           variant="primary"
           onClick={handleGenerateImage}
-          disabled={!canGenerateImage || isGeneratingImage}
+          disabled={!canGenerateImage || isGeneratingImage || !isServicesReady}
         >
           {isGeneratingImage
             ? intl.formatMessage(messages['openedx.ai.badges.editor.preview.generatingImage'])
@@ -129,25 +133,24 @@ const PreviewPanel = ({
         </Button>
       </div>
 
-      {allVersionImages.length > 1 && (
-        <div className="d-flex gap-2 flex-wrap">
-          {allVersionImages.slice(0, 6).map((image, idx) => {
-            const isActive = selectedVersionImage === image;
-            return (
-              <button
-                // eslint-disable-next-line react/no-array-index-key
-                key={idx}
-                type="button"
-                onClick={() => setSelectedVersionImage(isActive ? null : image)}
-                className={`badge-preview__version-thumb rounded p-0 border-0 bg-transparent${isActive ? ' badge-preview__version-thumb--active' : ''}`}
-                aria-pressed={isActive}
-              >
-                <img src={toSrc(image)} alt="" className="img-fluid rounded" />
-              </button>
-            );
-          })}
-        </div>
-      )}
+      <div className="d-flex gap-2 flex-wrap badge-preview__versions">
+        {allVersionImages.slice(0, 6).map((image, idx) => {
+          const isActive = selectedVersionImage === image;
+          return (
+            <button
+              // eslint-disable-next-line react/no-array-index-key
+              key={idx}
+              type="button"
+              onClick={() => setSelectedVersionImage(isActive ? null : image)}
+              className={`badge-preview__version-thumb rounded p-0 border-0 bg-transparent${isActive ? ' badge-preview__version-thumb--active' : ''}`}
+              aria-pressed={isActive}
+            >
+              <img src={toSrc(image)} alt="" className="img-fluid rounded" />
+            </button>
+          );
+        })}
+      </div>
+      <ApiStatusPanel contextData={contextData}/>
     </div>
   );
 };

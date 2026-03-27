@@ -2,7 +2,17 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  
 
+  .pgn__card .pgn__card-wrapper-image-cap.horizontal .pgn__card-image-cap, .pgn__card-image-cap {
+    object-fit: contain;
+  }
+
+  .pgn__bubble {
+    min-width: 1rem;
+    min-height: 1rem;
+    margin-right: 1rem;
+  }
   // restore overrided styles 
   .pgn__form-control-set-inline {
     display: flex;
@@ -32,6 +42,16 @@
     right: 0;
     bottom: 0;
     background-color: rgba(255, 255, 255, 0.7);
+  }
+
+  .badge-preview__image-area {
+    aspect-ratio: 1 / 1;
+    width: 100%;
+    padding: 0;
+  }
+
+  .badge-preview__versions {
+    min-height: 4.25rem; // 60px thumb + gap
   }
 
   .badge-preview__version-thumb {

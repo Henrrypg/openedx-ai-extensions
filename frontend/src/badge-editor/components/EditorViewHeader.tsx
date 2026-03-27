@@ -8,6 +8,7 @@ import messages from '../messages';
 interface EditorViewHeaderProps {
   badgeTitle: string;
   isNewBadge: boolean;
+  isBadgeReady: boolean;
   hasUnsavedChanges: boolean;
   isSaving: boolean;
   onBack: () => void;
@@ -19,6 +20,7 @@ interface EditorViewHeaderProps {
 const EditorViewHeader = ({
   badgeTitle,
   isNewBadge,
+  isBadgeReady,
   hasUnsavedChanges,
   isSaving,
   onBack,
@@ -38,7 +40,7 @@ const EditorViewHeader = ({
       >
         {intl.formatMessage(messages['openedx.ai.badges.editor.header.back'])}
       </Button>
-      <span className="font-weight-bold">{title}</span>
+      <span className="border-left pl-3 font-weight-bold">{title}</span>
       <ActionRow.Spacer />
       {!isNewBadge && (
         <Button
@@ -50,20 +52,24 @@ const EditorViewHeader = ({
           {intl.formatMessage(messages['openedx.ai.badges.editor.header.delete'])}
         </Button>
       )}
-      <Button
-        variant="outline-primary"
-        onClick={onSaveDraft}
-        disabled={isSaving || !hasUnsavedChanges}
-      >
-        {intl.formatMessage(messages['openedx.ai.badges.editor.header.saveDraft'])}
-      </Button>
-      <Button
-        variant="primary"
-        onClick={onSavePublish}
-        disabled={isSaving}
-      >
-        {intl.formatMessage(messages['openedx.ai.badges.editor.header.savePublish'])}
-      </Button>
+      {isBadgeReady && (
+        <>
+          <Button
+            variant="outline-primary"
+            onClick={onSaveDraft}
+            disabled={isSaving || !hasUnsavedChanges}
+          >
+            {intl.formatMessage(messages['openedx.ai.badges.editor.header.saveDraft'])}
+          </Button>
+          <Button
+            variant="primary"
+            onClick={onSavePublish}
+            disabled={isSaving}
+          >
+            {intl.formatMessage(messages['openedx.ai.badges.editor.header.savePublish'])}
+          </Button>
+        </>
+      )}
     </ActionRow>
   );
 };

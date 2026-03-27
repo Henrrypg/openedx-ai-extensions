@@ -12,12 +12,12 @@ import messages from './messages';
 import { GeneratedBadge } from '../types/badges';
 
 const Bold = (chunks: React.ReactNode) => <strong>{chunks}</strong>;
-const Br = () => <br />;
 
 interface GalleryViewProps {
   contextData: ReturnType<typeof services.prepareContextData>;
   onCreateNew: () => void;
   onEdit: (badge: GeneratedBadge) => void;
+  customMessage?: string;
 }
 
 const CreateBadgeAction = ({ onCreateNew }: { onCreateNew: () => void }) => {
@@ -29,10 +29,11 @@ const CreateBadgeAction = ({ onCreateNew }: { onCreateNew: () => void }) => {
   );
 };
 
-const GalleryView = ({ contextData, onCreateNew, onEdit }: GalleryViewProps) => {
+const GalleryView = ({
+  contextData, onCreateNew, onEdit, customMessage,
+}: GalleryViewProps) => {
   const intl = useIntl();
   const { data: badges = [], isLoading } = useListBadges(contextData);
-console.debug(badges)
   const columns = useMemo(() => [
     {
       id: 'name',
@@ -57,14 +58,15 @@ console.debug(badges)
   }
 
   if (badges.length === 0) {
-    return <EmptyStateView onCreateNew={onCreateNew} />;
+    return <EmptyStateView onCreateNew={onCreateNew} customMessage={customMessage} />;
   }
 
   return (
     <Container className="py-4">
       <p>
-        {intl.formatMessage(messages['openedx-ai-badges.tab.description'], { bold: Bold, br: Br })}
+        {intl.formatMessage(messages['openedx-ai-badges.tab.description'], { bold: Bold })}
       </p>
+      {customMessage && <p><small>{customMessage}</small></p>}
       <h2 className="mb-4">{intl.formatMessage(messages['openedx.ai.badges.gallery.title'])}</h2>
       <DataTable
         isFilterable
@@ -79,6 +81,7 @@ console.debug(badges)
         <DataTable.TableControlBar />
         <CardView
           CardComponent={CardWithEdit}
+          columnSizes={{ xs: 12, md: 6, lg: 6, xl: 4, }}
         />
         <DataTable.EmptyTable
           content={intl.formatMessage(messages['openedx.ai.badges.gallery.no.results'])}

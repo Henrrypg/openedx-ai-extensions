@@ -4,13 +4,12 @@ import { Form, StatefulButton } from '@openedx/paragon';
 import { services } from '@openedx/openedx-ai-extensions-ui';
 import { BadgeFormData, GeneratedBadge, SelectableFieldKey } from '../../types/badges';
 import { FORM_OPTIONS, DEFAULT_FORM_DATA } from '../contants';
-import { useBadgeGenerate } from '../data/apiHooks';
+import { useBadgeGenerate, useApiStatus } from '../data/apiHooks';
 import messages from '../messages';
 
 interface CreateFormProps {
   contextData: ReturnType<typeof services.prepareContextData>;
   onBadgeGenerated: (badge: GeneratedBadge) => void;
-  isServicesReady?: boolean;
 }
 
 const APPEARANCE_FIELDS: SelectableFieldKey[] = ['style', 'tone'];
@@ -19,8 +18,8 @@ const ACHIEVEMENT_FIELDS: SelectableFieldKey[] = ['level', 'criterion'];
 const CreateForm = ({
   contextData,
   onBadgeGenerated,
-  isServicesReady = true,
 }: CreateFormProps) => {
+  const { isServicesReady } = useApiStatus(contextData);
   const intl = useIntl();
   const [formData, setFormData] = useState<BadgeFormData>(DEFAULT_FORM_DATA);
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { snakeCaseObject } from '@edx/frontend-platform';
+import { snakeCaseObject, camelCaseObject } from '@edx/frontend-platform';
 import { useIntl } from '@edx/frontend-platform/i18n';
 import {
   Form, Button, Icon, IconButton, Stack, StatefulButton, TransitionReplace,
@@ -8,16 +8,13 @@ import { Edit } from '@openedx/paragon/icons';
 import { services } from '@openedx/openedx-ai-extensions-ui';
 import { GeneratedBadge, BadgeData } from '../../types/badges';
 import SkillChip from './SkillChip';
-import { useBadgeSave } from '../data/apiHooks';
+import { useBadgeSave, useBadgeGenerate, useApiStatus } from '../data/apiHooks';
 import messages from '../messages';
 
 interface EditFormProps {
   badge: GeneratedBadge;
   contextData: ReturnType<typeof services.prepareContextData>;
   onChange: (badge: GeneratedBadge) => void;
-  onRegenerate: () => void;
-  isRegenerating?: boolean;
-  statusMessage?: string | null;
   disabled?: boolean;
 }
 
@@ -35,9 +32,11 @@ interface ContextSectionProps {
   disabled: boolean;
 }
 
+
 const buildContextJson = (badge: GeneratedBadge) => ({
   course_context: badge.courseContext ? snakeCaseObject(badge.courseContext) : {},
   skills: badge.generatedResponse?.skills ?? [],
+  badgeConfiguration: badge.generatedResponse?.badgeConfiguration ?? {},
 });
 
 const ContextSection = ({
@@ -73,10 +72,15 @@ const ContextSection = ({
       const updated: GeneratedBadge = {
         ...badge,
         courseContext: parsed.course_context,
-        generatedResponse: { ...badge.generatedResponse, skills: parsed.skills },
+        generatedResponse: {
+          ...badge.generatedResponse,
+          skills: parsed.skills,
+          badgeConfiguration: parsed.badgeConfiguration,
+        },
       };
       const changed = JSON.stringify(parsed.course_context) !== JSON.stringify(original.course_context)
-        || JSON.stringify(parsed.skills) !== JSON.stringify(original.skills);
+        || JSON.stringify(parsed.skills) !== JSON.stringify(original.skills)
+        || JSON.stringify(parsed.badgeConfiguration) !== JSON.stringify(original.badgeConfiguration);
       if (changed) onContextChanged();
       onSave(updated);
       setIsEditing(false);
@@ -140,13 +144,16 @@ const ContextSection = ({
               <p className="mb-3">{intl.formatMessage(messages['openedx.ai.badges.editor.edit.skills.empty'])}</p>
             ) : (
               <div className="mb-3">
-                <SkillChip skills={skills} />
+                <SkillChip
+                  skills={skills}
+                />
               </div>
             )}
           </div>
         )}
       </TransitionReplace>
 
+      {!isEditing && (
       <div className="d-flex justify-content-between align-items-center">
         {isRegenerating && statusMessage ? (
           <p className="text-muted small mb-0">{statusMessage}</p>
@@ -163,6 +170,7 @@ const ContextSection = ({
           }}
         />
       </div>
+      )}
     </div>
   );
 };
@@ -218,10 +226,10 @@ const BadgeSection = ({
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center mb-2">
-        <h5 className="mb-0">
+        <h3 className="mb-0">
           {intl.formatMessage(messages['openedx.ai.badges.editor.edit.section.achievement'])}
           {achievement?.name ? `: ${achievement.name}` : ''}
-        </h5>
+        </h3>
         {!isEditing && (
           <Button
             as={IconButton}
@@ -294,10 +302,35 @@ const BadgeSection = ({
 // ─── EditForm (root) ─────────────────────────────────────────────────────────
 
 const EditForm = ({
-  badge, contextData, onChange, onRegenerate, isRegenerating = false, statusMessage = null, disabled = false,
+  badge, contextData, onChange, disabled = false,
 }: EditFormProps) => {
   const { save } = useBadgeSave(contextData);
+  const { generate, isGenerating, statusMessage, generatedBadge } = useBadgeGenerate(contextData);
+  const { isServicesReady } = useApiStatus(contextData);
   const [contextChanged, setContextChanged] = useState(false);
+
+  const prevGeneratedBadge = useRef<GeneratedBadge | null>(generatedBadge);
+  useEffect(() => {
+    if (generatedBadge && generatedBadge !== prevGeneratedBadge.current) {
+      prevGeneratedBadge.current = generatedBadge;
+      onChange(generatedBadge);
+    }
+  }, [generatedBadge, onChange]);
+
+  const handleRegenerate = () => {
+    const config = badge.generatedResponse?.badgeConfiguration ?? {};
+    generate({
+      formData: {
+        badge_id: (badge as any).id,
+        style: (config as any).badgeStyle ?? '',
+        tone: (config as any).badgeTone ?? '',
+        level: (config as any).badgeLevel ?? '',
+        criterion: (config as any).criterionStyle ?? '',
+        skillsEnabled: badge.generatedResponse?.enableSkillExtraction ?? false,
+      } as any,
+      action: 'regenerate',
+    });
+  };
 
   const handleSave = (updated: GeneratedBadge) => {
     onChange(updated);
@@ -315,12 +348,12 @@ const EditForm = ({
         badge={badge}
         onSave={handleSave}
         onContextChanged={() => setContextChanged(true)}
-        onRegenerate={onRegenerate}
-        canRegenerate={contextChanged && !isRegenerating && !disabled}
-        isRegenerating={isRegenerating}
+        onRegenerate={handleRegenerate}
+        canRegenerate={contextChanged && !isGenerating && !disabled && isServicesReady}
+        isRegenerating={isGenerating}
         statusMessage={statusMessage}
         isSaving={save.isLoading}
-        disabled={disabled}
+        disabled={disabled || isGenerating}
       />
       <hr />
       <BadgeSection

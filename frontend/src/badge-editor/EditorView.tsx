@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Container, Row, Col } from '@openedx/paragon';
 import { services } from '@openedx/openedx-ai-extensions-ui';
 import { GeneratedBadge, BadgeImageResult, BadgeStatus } from '../types/badges';
-import { useBadgeGenerate, useBadgeSave } from './data/apiHooks';
+import { useBadgeSave } from './data/apiHooks';
 import EditorViewHeader from './components/EditorViewHeader';
 import EditorPanel from './EditorPanel';
 import PreviewPanel from './PreviewPanel';
@@ -21,18 +21,7 @@ const EditorView = ({
   const [editedBadge, setEditedBadge] = useState<GeneratedBadge | null>(null);
   const [lastGeneratedImage, setLastGeneratedImage] = useState<BadgeImageResult | null>(null);
 
-  // Only used in edit mode for regeneration
-  const { generate, isGenerating, statusMessage, generatedBadge } = useBadgeGenerate(contextData);
   const { save, remove } = useBadgeSave(contextData);
-
-  // When regeneration produces a new badge, update editedBadge (ref-guarded against stale cache)
-  const prevGeneratedBadge = useRef<GeneratedBadge | null>(generatedBadge);
-  useEffect(() => {
-    if (generatedBadge && generatedBadge !== prevGeneratedBadge.current) {
-      prevGeneratedBadge.current = generatedBadge;
-      setEditedBadge(generatedBadge);
-    }
-  }, [generatedBadge]);
 
   const currentBadge = editedBadge ?? badge ?? null;
   const showEditForm = !!currentBadge;
@@ -41,11 +30,6 @@ const EditorView = ({
   const handleBadgeGenerated = useCallback((generated: GeneratedBadge) => {
     setEditedBadge(generated);
   }, []);
-
-  const handleRegenerate = useCallback(() => {
-    setEditedBadge(null);
-    generate({ formData: {} as any, action: 'regenerate' });
-  }, [generate]);
 
   const handleBadgeChange = useCallback((updated: GeneratedBadge) => {
     setEditedBadge(updated);
@@ -70,6 +54,7 @@ const EditorView = ({
       <EditorViewHeader
         badgeTitle={badgeTitle}
         isNewBadge={isNewBadge}
+        isBadgeReady={!!currentBadge}
         hasUnsavedChanges={!!editedBadge || !!lastGeneratedImage}
         isSaving={save.isLoading || remove.isLoading}
         onBack={onBack}
@@ -93,9 +78,6 @@ const EditorView = ({
               badge={currentBadge}
               contextData={contextData}
               onBadgeChange={handleBadgeChange}
-              onRegenerate={handleRegenerate}
-              isGenerating={isGenerating}
-              statusMessage={statusMessage}
             />
           ) : (
             <EditorPanel

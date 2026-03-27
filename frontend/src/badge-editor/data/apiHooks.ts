@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { services } from '@openedx/openedx-ai-extensions-ui';
 import {
@@ -36,7 +37,7 @@ export const useApiStatus = (
 
   return {
     services: query.data ?? null,
-    isLoading: query.isLoading,
+    isLoading: query.isFetching,
     isServicesReady,
     refresh: query.refetch,
   };
@@ -72,6 +73,19 @@ export const useBadgeGenerate = (
     : polling.data?.status === 'error'
       ? polling.data.error ?? 'Generation failed'
       : null;
+
+  useEffect(() => {
+    if (!generatedBadge) return;
+    const badgeId = (generatedBadge as any).id;
+    queryClient.setQueryData(
+      [pluginId, 'badges-list', contextData],
+      (old: GeneratedBadge[] | undefined) => {
+        const list = old ?? [];
+        if (badgeId && list.some((b: any) => b.id === badgeId)) return list;
+        return [...list, generatedBadge];
+      },
+    );
+  }, [generatedBadge, queryClient, contextData]);
 
   return {
     generate: mutation.mutate,

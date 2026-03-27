@@ -9,12 +9,13 @@ const Br = () => <br />;
 
 interface EmptyStateViewProps {
   onCreateNew: () => void;
+  customMessage?: string;
 }
 
-const EmptyStateView = ({ onCreateNew }: EmptyStateViewProps) => {
+const EmptyStateView = ({ onCreateNew, customMessage }: EmptyStateViewProps) => {
   const intl = useIntl();
   return (
-    <Container className="d-flex flex-column align-items-center justify-content-center h-100 py-5 text-center">
+    <Container size="md" className="d-flex flex-column align-items-center justify-content-center h-100 py-5 text-center">
       <div className="bg-light-200 rounded-circle p-4 mb-3">
         <Icon
           size="inline"
@@ -26,9 +27,12 @@ const EmptyStateView = ({ onCreateNew }: EmptyStateViewProps) => {
       <h2 className="mt-4">
         {intl.formatMessage(messages['openedx.ai.badges.empty.state.headline'])}
       </h2>
-      <p className="text-muted text-center mb-5">
+      <p className="text-center mb-5">
         {intl.formatMessage(messages['openedx-ai-badges.tab.description'], { bold: Bold, br: Br })}
       </p>
+      {customMessage && (
+        <p className="text-center small mb-5"><small>{customMessage}</small></p>
+      )}
       <Button variant="primary" onClick={onCreateNew}>
         {intl.formatMessage(messages['openedx.ai.badges.button.create'])}
       </Button>

@@ -7,7 +7,6 @@ interface CreatePanelProps {
   mode: 'create';
   contextData: ReturnType<typeof services.prepareContextData>;
   onBadgeGenerated: (badge: GeneratedBadge) => void;
-  isServicesReady?: boolean;
 }
 
 interface EditPanelProps {
@@ -15,9 +14,6 @@ interface EditPanelProps {
   badge: GeneratedBadge;
   contextData: ReturnType<typeof services.prepareContextData>;
   onBadgeChange: (badge: GeneratedBadge) => void;
-  onRegenerate: () => void;
-  isGenerating: boolean;
-  statusMessage?: string | null;
 }
 
 type EditorPanelProps = CreatePanelProps | EditPanelProps;
@@ -28,7 +24,6 @@ const EditorPanel = (props: EditorPanelProps) => {
       <CreateForm
         contextData={props.contextData}
         onBadgeGenerated={props.onBadgeGenerated}
-        isServicesReady={props.isServicesReady}
       />
     );
   }
@@ -38,10 +33,6 @@ const EditorPanel = (props: EditorPanelProps) => {
       badge={props.badge}
       contextData={props.contextData}
       onChange={props.onBadgeChange}
-      onRegenerate={props.onRegenerate}
-      isRegenerating={props.isGenerating}
-      statusMessage={props.statusMessage}
-      disabled={props.isGenerating}
     />
   );
 };
