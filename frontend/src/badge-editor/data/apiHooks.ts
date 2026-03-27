@@ -30,16 +30,20 @@ export const useApiStatus = (
     queryKey: queryKeys.apiStatus(contextData),
     queryFn: () => getApiStatus(contextData),
     enabled,
-    refetchInterval: API_STATUS_POLL_MS,
+    retry: 2,
+    refetchInterval: (data, q) => (q.state.status === 'error' ? false : API_STATUS_POLL_MS),
   });
 
   const isServicesReady = !query.data
     || !Object.values(query.data).some((s) => s.required && s.status === 'unavailable');
 
+  const error = query.error instanceof Error ? query.error.message : null;
+
   return {
     services: query.data ?? null,
     isLoading: query.isFetching,
     isServicesReady,
+    error,
     refresh: query.refetch,
   };
 };

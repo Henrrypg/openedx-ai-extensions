@@ -43,6 +43,11 @@ const messages = defineMessages({
     defaultMessage: 'Required services are offline. Badge generation is disabled.',
     description: 'Alert shown when one or more required services are unavailable',
   },
+  'openedx-ai-badges.api-status.fetch-error': {
+    id: 'openedx-ai-badges.api-status.fetch-error',
+    defaultMessage: 'Unable to check service status.',
+    description: 'Alert shown when the API status request fails after retries',
+  },
   'openedx-ai-badges.api-status.refresh': {
     id: 'openedx-ai-badges.api-status.refresh',
     defaultMessage: 'Refresh status',

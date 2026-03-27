@@ -49,7 +49,9 @@ const Semaphore = ({ serviceMap }: { serviceMap: Record<string, ApiService> | nu
 
 const ApiStatusPanel = ({ contextData, enabled = true }: ApiStatusPanelProps) => {
   const intl = useIntl();
-  const { services: serviceMap, isLoading, refresh } = useApiStatus(contextData, enabled);
+  const {
+    services: serviceMap, isLoading, error, refresh,
+  } = useApiStatus(contextData, enabled);
 
   const hasRequiredDown = serviceMap !== null
     && Object.values(serviceMap).some((s) => s.required && s.status === 'unavailable');
@@ -113,7 +115,12 @@ const ApiStatusPanel = ({ contextData, enabled = true }: ApiStatusPanelProps) =>
             })}
           </ul>
 
-          {hasRequiredDown && (
+          {error && (
+            <Alert variant="danger" className="mt-2 mb-0 py-2 small">
+              {`${intl.formatMessage(messages['openedx-ai-badges.api-status.fetch-error'])} ${error}`}
+            </Alert>
+          )}
+          {!error && hasRequiredDown && (
             <Alert variant="danger" className="mt-2 mb-0 py-2 small">
               {intl.formatMessage(messages['openedx-ai-badges.api-status.services-offline'])}
             </Alert>
