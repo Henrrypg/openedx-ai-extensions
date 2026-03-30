@@ -198,9 +198,10 @@ class BadgeOrchestrator(SessionBasedOrchestrator):
     def regenerate(self, input_data):
         """
         Regenerate the badge using the existing session metadata.
+
         Args:
             input_data: dict containing any necessary input for regeneration.
-                        Pass ``badge_id`` to update a specific badge in ``badges[]``.
+                Pass ``badge_id`` to update a specific badge in ``badges[]``.
         Returns:
             dict: Response containing the regenerated badge and status
         """
