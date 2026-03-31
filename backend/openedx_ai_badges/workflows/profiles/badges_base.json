@@ -20,7 +20,8 @@
         "component": "AIRequestBadgesComponent",
         "config": {
           "buttonText": "+",
-          "customMessage": "Uses the stable BadgeOrchestrator"
+          "customMessage": "Uses the stable BadgeOrchestrator",
+          "skillsSource": "llm"
         }
       },
       "response": {

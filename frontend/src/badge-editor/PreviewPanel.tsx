@@ -48,6 +48,7 @@ const PreviewPanel = ({
       setSessionImage(generatedImage);
       setLocalVersions((prev) => [generatedImage, ...prev]);
       setSelectedVersionImage(null);
+      onImageGenerated(generatedImage);
     }
   }, [generatedImage, onImageGenerated]);
 

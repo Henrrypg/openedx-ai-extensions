@@ -2,13 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import { snakeCaseObject } from '@edx/frontend-platform';
 import { useIntl } from '@edx/frontend-platform/i18n';
 import {
-  Form, Button, Icon, IconButton, Stack, StatefulButton, TransitionReplace,
+  Badge, Form, Button, Icon, IconButton, OverlayTrigger, Stack, StatefulButton, Tooltip, TransitionReplace,
 } from '@openedx/paragon';
 import { Edit } from '@openedx/paragon/icons';
 import { services } from '@openedx/openedx-ai-extensions-ui';
 import { GeneratedBadge, BadgeData } from '../../types/badges';
 import SkillChip from './SkillChip';
 import { useBadgeSave, useBadgeGenerate, useApiStatus } from '../data/apiHooks';
+import { useProfileConfig } from '../../data/apiHooks';
 import messages from '../messages';
 
 interface EditFormProps {
@@ -24,13 +25,17 @@ interface EditFormProps {
 interface ContextSectionProps {
   badge: GeneratedBadge;
   onSave: (updated: GeneratedBadge) => void;
-  onContextChanged: () => void;
-  onRegenerate: () => void;
-  canRegenerate: boolean;
-  isRegenerating: boolean;
-  statusMessage: string | null;
   isSaving: boolean;
   disabled: boolean;
+}
+
+interface SkillsSectionProps {
+  badge: GeneratedBadge;
+  skillsSource: string;
+  onRegenerate: (instructions: string) => void;
+  isRegenerating: boolean;
+  disabled: boolean;
+  statusMessage: string | null;
 }
 
 const buildContextJson = (badge: GeneratedBadge) => ({
@@ -39,8 +44,25 @@ const buildContextJson = (badge: GeneratedBadge) => ({
   badgeConfiguration: badge.generatedResponse?.badgeConfiguration ?? {},
 });
 
+const ProvenanceChip = ({ label, tooltip }: { label: string; tooltip?: string }) => {
+  const chip = (
+    <Badge variant="light" className="font-weight-normal small">
+      {label}
+    </Badge>
+  );
+  if (!tooltip) { return chip; }
+  return (
+    <OverlayTrigger
+      placement="top"
+      overlay={<Tooltip id={`provenance-${label}`}>{tooltip}</Tooltip>}
+    >
+      <span>{chip}</span>
+    </OverlayTrigger>
+  );
+};
+
 const ContextSection = ({
-  badge, onSave, onContextChanged, onRegenerate, canRegenerate, isRegenerating, statusMessage, isSaving, disabled,
+  badge, onSave, isSaving, disabled,
 }: ContextSectionProps) => {
   const intl = useIntl();
   const [isEditing, setIsEditing] = useState(false);
@@ -49,7 +71,6 @@ const ContextSection = ({
   const originalRef = useRef('');
 
   const courseContext = badge.courseContext ?? {};
-  const skills = badge.generatedResponse?.skills ?? [];
   const description = courseContext.description || courseContext.shortDescription || '';
 
   const handleEdit = () => {
@@ -68,7 +89,6 @@ const ContextSection = ({
   const handleSave = () => {
     try {
       const parsed = JSON.parse(localJson);
-      const original = JSON.parse(originalRef.current);
       const updated: GeneratedBadge = {
         ...badge,
         courseContext: parsed.course_context,
@@ -78,10 +98,6 @@ const ContextSection = ({
           badgeConfiguration: parsed.badgeConfiguration,
         },
       };
-      const changed = JSON.stringify(parsed.course_context) !== JSON.stringify(original.course_context)
-        || JSON.stringify(parsed.skills) !== JSON.stringify(original.skills)
-        || JSON.stringify(parsed.badgeConfiguration) !== JSON.stringify(original.badgeConfiguration);
-      if (changed) { onContextChanged(); }
       onSave(updated);
       setIsEditing(false);
     } catch {
@@ -91,8 +107,11 @@ const ContextSection = ({
 
   return (
     <div className="mb-4">
-      <div className="d-flex justify-content-between align-items-center mb-2">
-        <h3 className="mb-0">{intl.formatMessage(messages['openedx.ai.badges.editor.edit.section.courseContext'])}</h3>
+      <div className="d-flex justify-content-between align-items-center mb-1">
+        <div>
+          <h3 className="mb-1">{intl.formatMessage(messages['openedx.ai.badges.editor.edit.section.courseContext'])}</h3>
+          <ProvenanceChip label={intl.formatMessage(messages['openedx.ai.badges.editor.edit.provenance.fromCourse'])} />
+        </div>
         {!isEditing && (
           <Button
             as={IconButton}
@@ -107,7 +126,7 @@ const ContextSection = ({
 
       <TransitionReplace>
         {isEditing ? (
-          <div key="edit">
+          <div key="edit" className="mt-3">
             <Form.Control
               as="textarea"
               size="sm"
@@ -137,39 +156,103 @@ const ContextSection = ({
             </Stack>
           </div>
         ) : (
-          <div key="view">
-            <p className="mb-3">{description}</p>
-            <h4>{intl.formatMessage(messages['openedx.ai.badges.editor.edit.section.skills'])}</h4>
-            {skills.length === 0 ? (
-              <p className="mb-3">{intl.formatMessage(messages['openedx.ai.badges.editor.edit.skills.empty'])}</p>
-            ) : (
-              <div className="mb-3">
-                <SkillChip
-                  skills={skills}
-                />
-              </div>
-            )}
+          <div key="view" className="mt-3">
+            <p className="mb-0">{description}</p>
           </div>
         )}
       </TransitionReplace>
+    </div>
+  );
+};
 
-      {!isEditing && (
-      <div className="d-flex justify-content-between align-items-center">
-        {isRegenerating && statusMessage ? (
-          <p className="text-muted small mb-0">{statusMessage}</p>
-        ) : <span />}
-        <StatefulButton
-          state={isRegenerating ? 'pending' : 'default'}
-          onClick={onRegenerate}
-          disabled={!canRegenerate}
-          variant={canRegenerate ? 'primary' : 'outline-primary'}
-          labels={{
-            default: intl.formatMessage(messages['openedx.ai.badges.editor.edit.regenerate']),
-            pending: intl.formatMessage(messages['openedx.ai.badges.editor.edit.regenerating']),
-            complete: intl.formatMessage(messages['openedx.ai.badges.editor.edit.regenerate']),
-          }}
+const SkillsSection = ({
+  badge, skillsSource, onRegenerate, isRegenerating, disabled, statusMessage,
+}: SkillsSectionProps) => {
+  const intl = useIntl();
+  const skills = badge.generatedResponse?.skills ?? [];
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [instructions, setInstructions] = useState('');
+
+  const skillsTooltip = skillsSource === 'laiser'
+    ? intl.formatMessage(messages['openedx.ai.badges.editor.edit.provenance.aiExtracted.tooltip.laiser'])
+    : intl.formatMessage(messages['openedx.ai.badges.editor.edit.provenance.aiExtracted.tooltip.llm']);
+
+  const handleRun = () => {
+    onRegenerate(instructions);
+    setIsPanelOpen(false);
+    setInstructions('');
+  };
+
+  const handleCancel = () => {
+    setIsPanelOpen(false);
+    setInstructions('');
+  };
+
+  return (
+    <div className="mb-4">
+      <div className="mb-1">
+        <h3 className="mb-1">{intl.formatMessage(messages['openedx.ai.badges.editor.edit.section.skills'])}</h3>
+        <ProvenanceChip
+          label={intl.formatMessage(messages['openedx.ai.badges.editor.edit.provenance.aiExtracted'])}
+          tooltip={skillsTooltip}
         />
       </div>
+      <div className="mt-3 mb-3">
+        {skills.length === 0 ? (
+          <p className="mb-0">{intl.formatMessage(messages['openedx.ai.badges.editor.edit.skills.empty'])}</p>
+        ) : (
+          <SkillChip skills={skills} />
+        )}
+      </div>
+
+      {isPanelOpen ? (
+        <div className="border rounded p-3 mt-2">
+          <Form.Group className="mb-3">
+            <Form.Label className="small font-weight-bold">
+              {intl.formatMessage(messages['openedx.ai.badges.editor.edit.regenerate.instructions.label'])}
+            </Form.Label>
+            <Form.Control
+              as="textarea"
+              rows={3}
+              placeholder={intl.formatMessage(messages['openedx.ai.badges.editor.edit.regenerate.instructions.placeholder'])}
+              value={instructions}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setInstructions(e.target.value)}
+            />
+          </Form.Group>
+          <Stack direction="horizontal" gap={2} className="justify-content-between align-items-center">
+            {isRegenerating && statusMessage ? (
+              <p className="text-muted small mb-0">{statusMessage}</p>
+            ) : <span />}
+            <Stack direction="horizontal" gap={2}>
+              <Button variant="outline-secondary" size="sm" onClick={handleCancel} disabled={isRegenerating}>
+                {intl.formatMessage(messages['openedx.ai.badges.editor.edit.regenerate.cancel'])}
+              </Button>
+              <StatefulButton
+                size="sm"
+                state={isRegenerating ? 'pending' : 'default'}
+                onClick={handleRun}
+                disabled={isRegenerating}
+                variant="primary"
+                labels={{
+                  default: intl.formatMessage(messages['openedx.ai.badges.editor.edit.regenerate.run']),
+                  pending: intl.formatMessage(messages['openedx.ai.badges.editor.edit.regenerating']),
+                  complete: intl.formatMessage(messages['openedx.ai.badges.editor.edit.regenerate.run']),
+                }}
+              />
+            </Stack>
+          </Stack>
+        </div>
+      ) : (
+        <div className="d-flex justify-content-end">
+          <Button
+            variant="outline-primary"
+            size="sm"
+            onClick={() => setIsPanelOpen(true)}
+            disabled={disabled || isRegenerating}
+          >
+            {intl.formatMessage(messages['openedx.ai.badges.editor.edit.regenerate'])}
+          </Button>
+        </div>
       )}
     </div>
   );
@@ -225,11 +308,17 @@ const BadgeSection = ({
 
   return (
     <div>
-      <div className="d-flex justify-content-between align-items-center mb-2">
-        <h3 className="mb-0">
-          {intl.formatMessage(messages['openedx.ai.badges.editor.edit.section.achievement'])}
-          {achievement?.name ? `: ${achievement.name}` : ''}
-        </h3>
+      <div className="d-flex justify-content-between align-items-center mb-1">
+        <div>
+          <h3 className="mb-1">
+            {intl.formatMessage(messages['openedx.ai.badges.editor.edit.section.achievement'])}
+            {achievement?.name ? `: ${achievement.name}` : ''}
+          </h3>
+          <ProvenanceChip
+            label={intl.formatMessage(messages['openedx.ai.badges.editor.edit.provenance.aiGenerated'])}
+            tooltip={intl.formatMessage(messages['openedx.ai.badges.editor.edit.provenance.aiGenerated.tooltip'])}
+          />
+        </div>
         {!isEditing && (
           <Button
             as={IconButton}
@@ -310,7 +399,8 @@ const EditForm = ({
     generate, isGenerating, statusMessage, generatedBadge, generationError,
   } = useBadgeGenerate(contextData);
   const { isServicesReady } = useApiStatus(contextData);
-  const [contextChanged, setContextChanged] = useState(false);
+  const { data: profileConfig } = useProfileConfig(contextData);
+  const skillsSource = (profileConfig as any)?.request?.config?.skillsSource as string ?? 'llm';
 
   const prevGeneratedBadge = useRef<GeneratedBadge | null>(generatedBadge);
   useEffect(() => {
@@ -329,7 +419,7 @@ const EditForm = ({
     }
   }, [generationError, onError, intl]);
 
-  const handleRegenerate = () => {
+  const handleRegenerate = (instructions: string) => {
     const config = badge.generatedResponse?.badgeConfiguration ?? {};
     generate({
       formData: {
@@ -339,6 +429,7 @@ const EditForm = ({
         level: (config as any).badgeLevel ?? '',
         criterion: (config as any).criterionStyle ?? '',
         skillsEnabled: badge.generatedResponse?.enableSkillExtraction ?? false,
+        additionalInstructions: instructions,
       } as any,
       action: 'regenerate',
     });
@@ -352,18 +443,22 @@ const EditForm = ({
   return (
     <div>
       <h2 className="mb-2 text-primary">{intl.formatMessage(messages['openedx.ai.badges.editor.edit.title'])}</h2>
-      <p className="mb-4">{intl.formatMessage(messages['openedx.ai.badges.editor.edit.intro'])}</p>
+      <p className="mb-4 small text-muted">{intl.formatMessage(messages['openedx.ai.badges.editor.edit.intro'])}</p>
       <hr />
       <ContextSection
         badge={badge}
         onSave={handleSave}
-        onContextChanged={() => setContextChanged(true)}
-        onRegenerate={handleRegenerate}
-        canRegenerate={contextChanged && !isGenerating && !disabled && isServicesReady}
-        isRegenerating={isGenerating}
-        statusMessage={statusMessage}
         isSaving={save.isLoading}
         disabled={disabled || isGenerating}
+      />
+      <hr />
+      <SkillsSection
+        badge={badge}
+        skillsSource={skillsSource}
+        onRegenerate={handleRegenerate}
+        isRegenerating={isGenerating}
+        disabled={disabled || !isServicesReady}
+        statusMessage={statusMessage}
       />
       <hr />
       <BadgeSection

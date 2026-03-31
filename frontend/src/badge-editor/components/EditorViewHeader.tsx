@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useIntl } from '@edx/frontend-platform/i18n';
 import {
-  ActionRow, AlertModal, Button,
+  ActionRow, AlertModal, Button, Icon, IconButton,
 } from '@openedx/paragon';
-import { ArrowBack, DeleteOutline } from '@openedx/paragon/icons';
+import { ArrowBack, Close, DeleteOutline } from '@openedx/paragon/icons';
 import messages from '../messages';
 
 interface EditorViewHeaderProps {
@@ -107,6 +107,13 @@ const EditorViewHeader = ({
             </Button>
           </>
         )}
+        <IconButton
+          src={Close}
+          iconAs={Icon}
+          onClick={onBack}
+          disabled={isSaving}
+          alt={intl.formatMessage(messages['openedx.ai.badges.editor.header.back'])}
+        />
       </ActionRow>
 
       <AlertModal

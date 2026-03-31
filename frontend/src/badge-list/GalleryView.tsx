@@ -110,7 +110,7 @@ const GalleryView = ({
         <CardView
           CardComponent={CardWithEdit}
           columnSizes={{
-            xs: 12, md: 6, lg: 6, xl: 4,
+            xs: 12, md: 6, lg: 4, xl: 3,
           }}
         />
         <DataTable.EmptyTable

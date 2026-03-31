@@ -64,7 +64,8 @@ export const useBadgeGenerate = (
     queryKey: queryKeys.runStatus(contextData),
     queryFn: () => getRunStatus(contextData),
     enabled: mutation.isSuccess && mutation.data?.status === 'processing',
-    refetchInterval: (data) => {
+    refetchInterval: (data, query) => {
+      if (query.state.status === 'error') { return false; }
       if (!data || data.status === 'processing') { return RUN_STATUS_POLL_MS; }
       return false;
     },

@@ -99,7 +99,7 @@ const EditorView = ({
         </Alert>
       )}
       <Row className="mt-4">
-        <Col lg={4}>
+        <Col lg={3}>
           <PreviewPanel
             contextData={contextData}
             badge={currentBadge}
@@ -108,7 +108,7 @@ const EditorView = ({
             onError={setActionError}
           />
         </Col>
-        <Col lg={8}>
+        <Col lg={9}>
           {showEditForm ? (
             <EditorPanel
               mode="edit"
