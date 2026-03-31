@@ -261,7 +261,6 @@ const BadgeSection = ({
         <div>
           <h3 className="mb-1">
             {intl.formatMessage(messages['openedx.ai.badges.editor.edit.section.achievement'])}
-            {achievement?.name ? `: ${achievement.name}` : ''}
           </h3>
           <ProvenanceChip
             label={intl.formatMessage(messages['openedx.ai.badges.editor.edit.provenance.aiGenerated'])}
@@ -332,13 +331,28 @@ const BadgeSection = ({
           </div>
         ) : (
           <div key="view">
-            <p className="mb-2">{achievement?.description}</p>
+            {achievement?.name && (
+              <div className="mt-2 mb-2">
+                <span className="font-weight-bold">
+                  {intl.formatMessage(messages['openedx.ai.badges.editor.edit.name.label'])}
+                </span>
+                <p className="mb-0">{achievement.name}</p>
+              </div>
+            )}
+            {achievement?.description && (
+              <div className="mb-2">
+                <span className="font-weight-bold">
+                  {intl.formatMessage(messages['openedx.ai.badges.editor.edit.description.label'])}
+                </span>
+                <p className="mb-0">{achievement.description}</p>
+              </div>
+            )}
             {achievement?.criteria?.narrative && (
-              <div className="mt-2">
+              <div className="mb-0">
                 <span className="font-weight-bold">
                   {intl.formatMessage(messages['openedx.ai.badges.editor.edit.criteria.heading'])}
                 </span>
-                <p>{achievement.criteria.narrative}</p>
+                <p className="mb-0">{achievement.criteria.narrative}</p>
               </div>
             )}
           </div>

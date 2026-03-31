@@ -18,7 +18,7 @@ const messages = defineMessages({
   },
   'openedx.ai.badges.gallery.title': {
     id: 'openedx.ai.badges.gallery.title',
-    defaultMessage: 'My Badges',
+    defaultMessage: 'Generated Badges',
     description: 'Title heading for the badge gallery view',
   },
   'openedx.ai.badges.gallery.loading': {
