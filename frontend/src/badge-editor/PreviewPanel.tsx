@@ -160,8 +160,8 @@ const PreviewPanel = ({
           iconAs={Icon}
           variant="secondary"
           size="sm"
-          onClick={() => setImageConfigOpen((prev) => !prev)}
-          disabled={isGeneratingImage}
+          onClick={isGeneratingImage ? undefined : () => setImageConfigOpen((prev) => !prev)}
+          alt={intl.formatMessage(messages['openedx.ai.badges.editor.imageConfig.openSettings'])}
           aria-label={intl.formatMessage(messages['openedx.ai.badges.editor.imageConfig.openSettings'])}
         />
       </div>
