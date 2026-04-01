@@ -41,9 +41,10 @@ class OpenEdXEventsProcessor:
         Args:
             course_id: A ``CourseKey`` instance or any value accepted by
                 ``CourseKey.from_string()``.
-            badge_info (dict): The Open Badges 3.0 ``BadgeClass`` dict as
-                returned by the LLM processor.  Expected keys:
-                ``name``, ``description``, ``criteria.narrative``, ``image``.
+            badge_info (dict): Full session badge entry as stored in
+                ``AIWorkflowSession.metadata['badges']``.  Must contain at
+                minimum a ``generated_response`` key with the Open Badges 3.0
+                payload (``credentialSubject`` or ``credential_subject``).
 
         Returns:
             dict: ``{'response': {generation_uuid, course_id, badge_name}, 'status': 'generated'}``
@@ -64,26 +65,10 @@ class OpenEdXEventsProcessor:
 
         generation_uuid = str(uuid4())
 
-        # Open Badges 3.0 stores image as an object or plain string
-        image_field = badge_info.get('image', '')
-        if isinstance(image_field, dict):
-            image_url = image_field.get('id', '') or image_field.get('url', '')
-        else:
-            image_url = str(image_field) if image_field else ''
-
-        # ``criteria`` can be a nested dict (OB3.0) or a plain string
-        criteria = badge_info.get('criteria', {})
-        criteria_narrative = (
-            criteria.get('narrative', '') if isinstance(criteria, dict) else (str(criteria) if criteria else '')
-        )
-
         event_data = BadgeGenerationData(
             uuid=generation_uuid,
             course_id=course_id,
-            name=badge_info.get('name', ''),
-            description=badge_info.get('description', ''),
-            criteria_narrative=criteria_narrative,
-            image_url=image_url,
+            badge_data=badge_info,
         )
 
         try:
@@ -92,15 +77,32 @@ class OpenEdXEventsProcessor:
             logger.exception("Failed to emit BADGE_GENERATION: %s", exc)
             return {'error': f'Failed to emit BADGE_GENERATION: {exc}', 'status': 'error'}
 
+        badge_name = self._extract_badge_name(badge_info)
         logger.info(
             "BADGE_GENERATION emitted for course=%s generation_uuid=%s badge_name=%r",
-            course_id, generation_uuid, event_data.name,
+            course_id, generation_uuid, badge_name,
         )
         return {
             'response': {
                 'generation_uuid': generation_uuid,
                 'course_id': str(course_id),
-                'badge_name': event_data.name,
+                'badge_name': badge_name,
             },
             'status': 'generated',
         }
+
+    @staticmethod
+    def _extract_badge_name(badge_info: dict) -> str:
+        """
+        Extract the achievement name from a session badge entry.
+
+        Handles both camelCase (``credentialSubject``, local LLM path) and
+        snake_case (``credential_subject``, MIT DCC path) field names.
+        """
+        generated = badge_info.get('generated_response', {})
+        subject = (
+            generated.get('credentialSubject')
+            or generated.get('credential_subject')
+            or {}
+        )
+        return subject.get('achievement', {}).get('name', '')

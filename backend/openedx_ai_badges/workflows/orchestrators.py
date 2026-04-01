@@ -179,6 +179,11 @@ class BadgeOrchestrator(SessionBasedOrchestrator):
 
         badge['status'] = status
         self.session.save(update_fields=['metadata'])
+
+        # Publish badge if status is 'published' and emit event
+        if status == 'published':
+            self._emit_badge_generation(badge)
+
         return {"response": badge, "status": "saved"}
 
     def delete_draft(self, input_data):
@@ -517,29 +522,17 @@ class BadgeOrchestrator(SessionBasedOrchestrator):
 
         return {"response": badge, "status": "completed"}
 
-    def submit(self, input_data):  # pylint: disable=unused-argument
-        """
-        Emit the ``BADGE_GENERATION`` openedx-event for the badge stored in
-        the current session.
-
-        Called by the frontend "Submit Badge" button via ``action: 'submit'``.
-
-        Returns:
-            dict: Processor response on success, or error dict.
-        """
-        complete_info = self.session.metadata.get('complete_info', {})
-        badge_info = complete_info.get('badge', {})
-
-        if not badge_info:
-            return {
-                'error': 'No badge data found in session. Please generate a badge first.',
-                'status': 'error',
-            }
-
-        return self._emit_badge_generation(badge_info)
-
     def _emit_badge_generation(self, badge_info: dict) -> dict:
-        """Emit the BADGE_GENERATION event and return the processor result."""
+        """
+        Emit the BADGE_GENERATION event and return the processor result.
+
+        Args:
+            badge_info (dict): Full session badge entry as stored in
+                ``self.session.metadata['badges']``.  The complete structure
+                (``id``, ``status``, ``course_context``, ``generated_response``,
+                ``badge_image``, etc.) is forwarded as-is into
+                ``BadgeGenerationData.badge_data``.
+        """
         try:
             result = OpenEdXEventsProcessor().emit_badge_generation(
                 course_id=self.course_id,

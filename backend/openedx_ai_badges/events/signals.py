@@ -11,7 +11,7 @@ from openedx_events.tooling import OpenEdxPublicSignal
 
 from openedx_ai_badges.events.data import BadgeGenerationData
 
-# .. event_type: org.openedx.learning.badge.generation.v1
+# .. event_type: org.openedx.content_authoring.badge.generation.v1
 # .. event_name: BADGE_GENERATION
 # .. event_description: Emitted when an AI-generated badge definition is published
 #      for a course.  Downstream systems (e.g. Credentials → Credly)
@@ -23,7 +23,7 @@ from openedx_ai_badges.events.data import BadgeGenerationData
 # .. event_trigger_repository: eduNEXT/openedx-ai-badges
 # .. event_warning: Local event pending contribution to openedx/openedx-events.
 BADGE_GENERATION = OpenEdxPublicSignal(
-    event_type="org.openedx.learning.badge.generation.v1",
+    event_type="org.openedx.content_authoring.badge.generation.v1",
     data={
         "badge_generation": BadgeGenerationData,
     },
