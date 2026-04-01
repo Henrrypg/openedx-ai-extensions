@@ -24,37 +24,66 @@ class BadgeGenerationData:
     course context and image) as a single ``badge_data`` field.  No learner
     PII is included — this is a course-level artifact.
 
-    The ``badge_data`` dict mirrors the shape stored in the
-    ``AIWorkflowSession.metadata['badges']`` list::
+    All keys in ``badge_data`` are **camelCase** — snake_case is normalised
+    away before the event is emitted.
+
+    ``badge_data`` structure::
 
         {
-          "id":               str,            # badge UUID
-          "status":           str,            # "published"
-          "created_at":       str,            # ISO-8601
-          "course_context":   dict,           # title, overview, …
-          "generated_response": {
-            "credentialSubject": {            # camelCase (local LLM path)
-              "achievement": {
-                "name":        str,
-                "description": str,
-                "criteria":    {"narrative": str},
+          "id":     str,
+          "status": str,          # "published"
+          "versions": [
+            {
+              "id":        str,
+              "createdAt": str,   # ISO-8601
+              "badgeImage": {
+                "b64":    str,    # base-64 encoded PNG
+                "config": {
+                  "layers":      list[dict],
+                  "scaleFactor": int
+                }
+              },
+              "courseContext": {
+                "title":            str,
+                "overview":         str,
+                "description":      str,
+                "shortDescription": str
+              },
+              "generatedResponse": {
+                "enableSkillExtraction": bool,
+                "badgeConfiguration": {
+                  "badgeStyle":     str,
+                  "badgeTone":      str,
+                  "badgeLevel":     str,
+                  "criterionStyle": str
+                },
+                "skills": [
+                  {
+                    "type":       str,   # e.g. "Alignment"
+                    "targetName": str,
+                    "targetType": str,   # e.g. "CF:Skill"
+                    "targetUrl":  str
+                  }
+                ],
+                "credentialSubject": {
+                  "achievement": {
+                    "name":        str,
+                    "description": str,
+                    "criteria": {
+                      "narrative": str
+                    }
+                  }
+                }
               }
-            },
-            # -- or MIT DCC path --
-            "credential_subject": { … },      # snake_case
-            "skills": [ {Alignment} … ],
-            "badge_configuration": { … },
-            "enable_skill_extraction": bool,
-          },
-          "badge_image":      dict | None,    # {"b64": …, "config": …}
-          "versions":         list,
+            }
+          ]
         }
 
     Attributes:
         uuid (str): Unique identifier for this generation event (UUID v4).
         course_id (CourseKey): The course for which the badge was generated.
-        badge_data (dict): Complete session badge entry (see above).
         origin (str): Identifier of the system that generated the badge.
+        badge_data (dict): Complete camelCase badge entry (see above).
     """
 
     uuid = attr.ib(type=str)

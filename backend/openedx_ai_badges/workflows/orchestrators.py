@@ -27,6 +27,26 @@ from openedx_ai_badges.processors.openedx_events_processor import OpenEdXEventsP
 logger = logging.getLogger(__name__)
 
 
+def _snake_to_camel(name: str) -> str:
+    """Convert a snake_case string to camelCase."""
+    parts = name.split('_')
+    return parts[0] + ''.join(p.title() for p in parts[1:])
+
+
+def _camelize_keys(obj):
+    """
+    Recursively convert all dict keys from snake_case to camelCase.
+
+    Lists and scalars are traversed/returned unchanged aside from their
+    dict children being transformed.
+    """
+    if isinstance(obj, dict):
+        return {_snake_to_camel(k): _camelize_keys(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_camelize_keys(item) for item in obj]
+    return obj
+
+
 class BadgeOrchestrator(SessionBasedOrchestrator):
     """
     Orchestrator to generate Open Badges 3.0 BadgeClass
@@ -180,9 +200,8 @@ class BadgeOrchestrator(SessionBasedOrchestrator):
         badge['status'] = status
         self.session.save(update_fields=['metadata'])
 
-        # Publish badge if status is 'published' and emit event
         if status == 'published':
-            self._emit_badge_generation(badge)
+            self._emit_badge_generation(_camelize_keys(badge))
 
         return {"response": badge, "status": "saved"}
 
