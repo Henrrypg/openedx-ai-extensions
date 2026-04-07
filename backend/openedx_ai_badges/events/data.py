@@ -27,51 +27,47 @@ class BadgeGenerationData:
     All keys in ``badge_data`` are **camelCase** — snake_case is normalised
     away before the event is emitted.
 
+    ``badge_data`` is a serialized **OpenBadgeCredential** (OB 3.0 / W3C VC)
+    document.  Only the fields that have a direct mapping in the spec are
+    included; internal fields (``course_context``, ``badge_configuration``,
+    ``enable_skill_extraction``, etc.) are intentionally omitted.
+
     ``badge_data`` structure::
 
         {
-          "id":     str,
-          "status": str,          # "published"
-          "versions": [
-            {
-              "id":        str,
-              "createdAt": str,   # ISO-8601
-              "badgeImage": str,   # URL
+          "@context": [
+            "https://www.w3.org/ns/credentials/v2",
+            "https://purl.imsglobal.org/spec/ob/v3p0/context-3.0.3.json"
+          ],
+          "id":        str,          # "urn:uuid:<badge_id>"
+          "type":      ["VerifiableCredential", "OpenBadgeCredential"],
+          "name":      str,          # achievement name
+          "validFrom": str,          # ISO-8601 timestamp
+          "credentialSubject": {
+            "type": ["AchievementSubject"],
+            "achievement": {
+              "id":          str,    # "urn:uuid:<achievement_id>"
+              "type":        ["Achievement"],
+              "name":        str,
+              "description": str,
+              "criteria": {
+                "narrative": str
               },
-              "courseContext": {
-                "title":            str,
-                "overview":         str,
-                "description":      str,
-                "shortDescription": str
-              },
-              "generatedResponse": {
-                "enableSkillExtraction": bool,
-                "badgeConfiguration": {
-                  "badgeStyle":     str,
-                  "badgeTone":      str,
-                  "badgeLevel":     str,
-                  "criterionStyle": str
-                },
-                "skills": [
-                  {
-                    "type":       str,   # e.g. "Alignment"
-                    "targetName": str,
-                    "targetType": str,   # e.g. "CF:Skill"
-                    "targetUrl":  str
-                  }
-                ],
-                "credentialSubject": {
-                  "achievement": {
-                    "name":        str,
-                    "description": str,
-                    "criteria": {
-                      "narrative": str
-                    }
-                  }
+              "alignment": [         # present only when skills were generated
+                {
+                  "type":              ["Alignment"],
+                  "targetName":        str,
+                  "targetUrl":         str,
+                  "targetType":        str,   # e.g. "ESCO:Skill"
+                  "targetDescription": str    # optional
                 }
+              ],
+              "image": {             # present only when a badge image exists
+                "type": "Image",
+                "id":   str          # data URI (data:image/png;base64,...)
               }
             }
-          ]
+          }
         }
 
     Attributes:

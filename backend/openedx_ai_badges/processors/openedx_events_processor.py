@@ -11,6 +11,7 @@ from uuid import uuid4
 from opaque_keys.edx.keys import CourseKey
 
 from openedx_ai_badges.events.data import BadgeGenerationData
+from openedx_ai_badges.events.serializers import to_open_badge_credential
 from openedx_ai_badges.events.signals import BADGE_GENERATION
 
 logger = logging.getLogger(__name__)
@@ -65,10 +66,12 @@ class OpenEdXEventsProcessor:
 
         generation_uuid = str(uuid4())
 
+        ob3_credential = to_open_badge_credential(badge_info)
+
         event_data = BadgeGenerationData(
             uuid=generation_uuid,
             course_id=course_id,
-            badge_data=badge_info,
+            badge_data=ob3_credential,
         )
 
         try:
