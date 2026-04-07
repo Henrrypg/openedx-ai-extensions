@@ -2,8 +2,7 @@
 Badge Orchestrator - Generates Open Badges 3.0 BadgeClass via async Celery tasks.
 
 Session metadata stores multiple badges per session under a ``badges`` list.
-Each badge entry has an ``id``, ``status`` (draft/published), ``complete_info``
-(the generated data), and ``versions`` (image history).
+Each badge entry has an ``id``, ``status`` (draft/published), and ``versions`` (image history).
 """
 import json
 import logging
@@ -54,18 +53,6 @@ class BadgeOrchestrator(SessionBasedOrchestrator):
         """Write an intermediate status message for image generation polling."""
         self.session.metadata['image_task_status_message'] = message
         self.session.save(update_fields=['metadata'])
-
-    def _add_badge_from_complete_info(self, complete_info):
-        """Create a draft badge entry from a completed generation result and append it to the badges list."""
-        badge = {
-            'id': str(uuid.uuid4()),
-            'status': 'draft',
-            'created_at': datetime.now(timezone.utc).isoformat(),
-            'versions': [],
-            **complete_info,
-        }
-        self._get_badges().append(badge)
-        return badge
 
     def _resolve_regenerate_context(self, input_data):
         """
@@ -206,45 +193,6 @@ class BadgeOrchestrator(SessionBasedOrchestrator):
     # ------------------------------------------------------------------
     # Existing actions
     # ------------------------------------------------------------------
-
-    def save(self, input_data):
-        """
-        Save the updated value to session metadata.
-        Args:
-            input_data: dict with keys 'key' and 'value'
-        Returns:
-            dict: Response containing the updated metadata and status
-        """
-        key = input_data.get('key')
-        value = input_data.get('value')
-        if not key:
-            return {'error': 'Missing key', 'status': 'error'}
-        if 'complete_info' not in self.session.metadata:
-            self.session.metadata['complete_info'] = {}
-        # Verify that the value is JSON serializable
-        try:
-            if isinstance(value, str):
-                value = json.loads(value)
-            json.dumps(value)
-        except Exception as e:      # pylint: disable=broad-exception-caught
-            return {'error': f'Value must be valid JSON: {str(e)}', 'status': 'error'}
-        complete_info = self.session.metadata['complete_info']
-        generated_response = complete_info.get('generated_response', {})
-
-        if key == 'achievement':
-            generated_response.setdefault('credentialSubject', {})['achievement'] = value
-            complete_info['generated_response'] = generated_response
-        elif key == 'skills':
-            generated_response['skills'] = value
-            complete_info['generated_response'] = generated_response
-        else:
-            complete_info[key] = value
-
-        self.session.save(update_fields=['metadata'])
-        return {
-            "response": complete_info,
-            "status": "saved",
-        }
 
     def regenerate(self, input_data):
         """
@@ -456,9 +404,11 @@ class BadgeOrchestrator(SessionBasedOrchestrator):
             }
 
             # Persist image and mark image task complete
-            if 'complete_info' not in self.session.metadata:
-                self.session.metadata['complete_info'] = {}
-            self.session.metadata['complete_info']['badge_image'] = badge_image_data
+            if input_data.get('badge_id'):
+                badge_id = input_data['badge_id']
+                _, badge = self._find_badge(badge_id)
+                if badge:
+                    badge['badge_image'] = badge_image_data  # pylint: disable=unsupported-assignment-operation
             self.session.metadata['image_task_status'] = 'completed'
             self.session.metadata['image_task_result'] = badge_image_data
             self.session.save(update_fields=['metadata'])
@@ -487,8 +437,7 @@ class BadgeOrchestrator(SessionBasedOrchestrator):
         if isinstance(course_context, dict) and 'error' in course_context:
             return course_context
 
-        complete_info = {}
-        complete_info['course_context'] = course_context
+        input_data['course_context'] = course_context
 
         skills_enabled = input_data.get('skills_enabled', False) or input_data.get('skillsEnabled', False)
         generated_response = {
@@ -509,17 +458,15 @@ class BadgeOrchestrator(SessionBasedOrchestrator):
             generated_response['skills'] = skills
 
         self._set_status_message("Generating badge definition...")
-        credential_subject = self._get_achievement(complete_info, input_data)
+        credential_subject = self._get_achievement(course_context, input_data)
         if isinstance(credential_subject, dict) and 'error' in credential_subject:
             return credential_subject
         generated_response['credentialSubject'] = credential_subject
 
-        complete_info['generated_response'] = generated_response
-        self.session.metadata['complete_info'] = complete_info
-        badge = self._add_badge_from_complete_info(complete_info)
-        self.session.save(update_fields=['metadata'])
+        input_data['generated_response'] = generated_response
+        response = self.save_badge(input_data)
 
-        return {"response": badge, "status": "completed"}
+        return {"response": response.get("response", {}), "status": "completed"}
 
     def _emit_badge_generation(self, badge_info: dict) -> dict:
         """
@@ -593,14 +540,14 @@ class BadgeOrchestrator(SessionBasedOrchestrator):
                 'status': 'error'
             }
 
-    def _get_achievement(self, complete_info, input_data, regenerate=False):
+    def _get_achievement(self, context, input_data, regenerate=False):
         """Run BadgeProcessor and return the credentialSubject dict or an error dict."""
         badge_processor = BadgeProcessor(
             self.profile.processor_config,
             regenerate=regenerate
         )
         llm_result = badge_processor.process(
-            context=json.dumps(complete_info),
+            context=json.dumps(context),
             input_data=json.dumps(input_data)
         )
         if 'error' in llm_result:
