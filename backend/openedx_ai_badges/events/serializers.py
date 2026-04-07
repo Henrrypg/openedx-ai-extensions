@@ -13,7 +13,6 @@ Reference spec:
 """
 import uuid as _uuid
 
-
 # OB 3.0 JSON-LD contexts
 _OB3_CONTEXTS = [
     "https://www.w3.org/ns/credentials/v2",

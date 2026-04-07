@@ -255,7 +255,6 @@ class BadgeOrchestrator(SessionBasedOrchestrator):
         self.session.save(update_fields=['metadata'])
         return {"response": badge, "status": "completed"}
 
-
     def generate_image_async(self, input_data):
         """
         Launch async task to execute the generate_image method.
@@ -400,7 +399,7 @@ class BadgeOrchestrator(SessionBasedOrchestrator):
                 badge_id = input_data['badge_id']
                 _, badge = self._find_badge(badge_id)
                 if badge:
-                    badge['badge_image'] = badge_image_data  # pylint: disable=unsupported-assignment-operation
+                    badge['badge_image'] = badge_image_data
             self.session.metadata['image_task_status'] = 'completed'
             self.session.metadata['image_task_result'] = badge_image_data
             self.session.save(update_fields=['metadata'])
