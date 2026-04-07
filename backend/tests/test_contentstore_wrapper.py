@@ -10,11 +10,14 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from openedx_ai_badges.edxapp_wrapper.contentstore import _get_backend, get_static_content, update_course_run_asset
+
+_IMPORT_MODULE = "openedx_ai_badges.edxapp_wrapper.contentstore.import_module"
+
 
 @pytest.fixture(autouse=True)
 def clear_backend_cache():
     """Clear the lru_cache on _get_backend between tests."""
-    from openedx_ai_badges.edxapp_wrapper.contentstore import _get_backend
     _get_backend.cache_clear()
     yield
     _get_backend.cache_clear()
@@ -30,8 +33,7 @@ class TestGetStaticContent:
         fake_backend.StaticContent = fake_static_content
         settings.OPENEDX_AI_BADGES_CONTENTSTORE_BACKEND = "fake.backend"
 
-        with patch("openedx_ai_badges.edxapp_wrapper.contentstore.import_module", return_value=fake_backend) as mock_import:
-            from openedx_ai_badges.edxapp_wrapper.contentstore import get_static_content
+        with patch(_IMPORT_MODULE, return_value=fake_backend) as mock_import:
             result = get_static_content()
 
         mock_import.assert_called_once_with("fake.backend")
@@ -42,8 +44,7 @@ class TestGetStaticContent:
         fake_backend = MagicMock()
         settings.OPENEDX_AI_BADGES_CONTENTSTORE_BACKEND = "my.custom.backend"
 
-        with patch("openedx_ai_badges.edxapp_wrapper.contentstore.import_module", return_value=fake_backend) as mock_import:
-            from openedx_ai_badges.edxapp_wrapper.contentstore import get_static_content
+        with patch(_IMPORT_MODULE, return_value=fake_backend) as mock_import:
             get_static_content()
 
         mock_import.assert_called_once_with("my.custom.backend")
@@ -54,8 +55,7 @@ class TestGetStaticContent:
         fake_backend.StaticContent = MagicMock()
         settings.OPENEDX_AI_BADGES_CONTENTSTORE_BACKEND = "fake.backend"
 
-        with patch("openedx_ai_badges.edxapp_wrapper.contentstore.import_module", return_value=fake_backend) as mock_import:
-            from openedx_ai_badges.edxapp_wrapper.contentstore import get_static_content
+        with patch(_IMPORT_MODULE, return_value=fake_backend) as mock_import:
             get_static_content()
             get_static_content()
 
@@ -75,8 +75,7 @@ class TestUpdateCourseRunAsset:
         course_key = MagicMock()
         upload_file = MagicMock()
 
-        with patch("openedx_ai_badges.edxapp_wrapper.contentstore.import_module", return_value=fake_backend):
-            from openedx_ai_badges.edxapp_wrapper.contentstore import update_course_run_asset
+        with patch(_IMPORT_MODULE, return_value=fake_backend):
             result = update_course_run_asset(course_key, upload_file)
 
         fake_backend.update_course_run_asset.assert_called_once_with(course_key, upload_file)
@@ -87,8 +86,7 @@ class TestUpdateCourseRunAsset:
         fake_backend = MagicMock()
         settings.OPENEDX_AI_BADGES_CONTENTSTORE_BACKEND = "fake.backend"
 
-        with patch("openedx_ai_badges.edxapp_wrapper.contentstore.import_module", return_value=fake_backend):
-            from openedx_ai_badges.edxapp_wrapper.contentstore import update_course_run_asset
+        with patch(_IMPORT_MODULE, return_value=fake_backend):
             update_course_run_asset("arg1", "arg2", extra="kwarg")
 
         fake_backend.update_course_run_asset.assert_called_once_with("arg1", "arg2", extra="kwarg")
