@@ -83,6 +83,7 @@ const PreviewPanel = ({
       : {
         badge_name: achievement?.name ?? '',
         badge_description: achievement?.description ?? '',
+        badge_id: badge?.id ?? '',
       };
     generateImage({ ...basePayload, ...modePayload });
   };

@@ -109,7 +109,7 @@ def test_generate_image_success(mock_settings, mock_post):
 
     assert result["status"] == "completed"
     assert result["response"]["b64"] == "fakebase64"
-    assert "badge_image" in orchestrator.session.metadata["complete_info"]
+    assert orchestrator.session.metadata["image_task_result"]["b64"] == "fakebase64"
     assert orchestrator.session.save.called
 
     # Verify endpoint
