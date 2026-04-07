@@ -66,6 +66,9 @@ class OpenEdXEventsProcessor:
 
         generation_uuid = str(uuid4())
 
+        org = course_id.org if course_id else 'unknown_org'
+        badge_info["organization"] = org
+
         ob3_credential = to_open_badge_credential(badge_info)
 
         event_data = BadgeGenerationData(

@@ -44,10 +44,15 @@ class BadgeGenerationData:
           "name":      str,          # achievement name
           "image":     {
             "type": "Image",
-            "id":   str          # image URL
+            "id":   str,        # image URL
+            "caption": str
           }
           "validFrom": str,          # ISO-8601 timestamp
-          "issuer":    dict,
+          "issuer":    {
+            "id":   str,
+            "type": "Profile",
+            "name": str
+          },
           "credentialSubject": {
             "type": ["AchievementSubject"],
             "achievement": {
@@ -69,7 +74,8 @@ class BadgeGenerationData:
               ],
               "image": {             # present only when a badge image exists
                 "type": "Image",
-                "id":   str          # image URL
+                "id":   str,          # image URL
+                "caption": str
               }
             }
           }

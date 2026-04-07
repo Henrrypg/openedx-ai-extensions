@@ -55,9 +55,8 @@ def to_open_badge_credential(badge_info: dict) -> dict:
                             }
                         ]
                     },
-                    "badge_image": {                   # optional
-                        "b64": str,                    # base64-encoded PNG/SVG
-                        "config": dict
+                    "image": {
+                        "id": str,               # URL of the badge image
                     }
                 }
 
@@ -81,7 +80,7 @@ def to_open_badge_credential(badge_info: dict) -> dict:
                         "description": "<description>",
                         "criteria": {"narrative": "<narrative>"},
                         "alignment": [...],  # present only when skills exist
-                        "image": {...}        # present only when badge_image exists
+                        "image": {...}
                     }
                 }
             }
@@ -127,17 +126,17 @@ def to_open_badge_credential(badge_info: dict) -> dict:
             alignment.append(entry)
         achievement["alignment"] = alignment
 
-    badge_image = badge_info.get('badge_image') or {}
-    badge_url = badge_image.get('b_64', '')[:10]  # TODO: store base64 as asset and reference via URL
+    badge_image = badge_info.get('image') or {}
     achievement["image"] = {
         "type": "Image",
-        "id": badge_url,
+        "id": badge_image.get('id', ''),
+        "caption": achievement_name,
     }
 
     issuer = {
       "id": "urn:uuid:issuer-" + str(_uuid.uuid4()),
       "type": "Profile",
-      "name": "Issuer Name"  # TODO: populate with real issuer info (e.g., platform name, URL, contact info)
+      "name": badge_info.get('organization', 'Unknown Organization'),
     }
 
     credential: dict = {
