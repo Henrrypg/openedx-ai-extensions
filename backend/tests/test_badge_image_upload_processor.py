@@ -45,7 +45,7 @@ class TestUploadImageToAssets:
     """Tests for BadgeImageUploadProcessor.upload_image_to_assets."""
 
     def test_returns_public_url_on_success(self, upload_processor, settings):
-        """Successful upload returns a fully-qualified public URL."""
+        """Successful upload returns a fully-qualified public URL with a cache-busting ?v= param."""
         settings.LMS_ROOT_URL = LMS_ROOT
         mock_upload, mock_get_static = _make_upload_mock()
 
@@ -53,7 +53,8 @@ class TestUploadImageToAssets:
              patch(f"{_MODULE}.get_static_content", mock_get_static):
             url = upload_processor.upload_image_to_assets(COURSE_ID_STR, MINIMAL_PNG_B64, BADGE_ID)
 
-        assert url == f"{LMS_ROOT}{ASSET_PATH}"
+        assert url.startswith(f"{LMS_ROOT}{ASSET_PATH}?v=")
+        assert url[len(f"{LMS_ROOT}{ASSET_PATH}?v="):].isdigit()
 
     def test_strips_data_url_prefix(self, upload_processor, settings):
         """Data URL prefix is stripped before decoding so the upload receives raw PNG bytes."""
@@ -64,7 +65,7 @@ class TestUploadImageToAssets:
              patch(f"{_MODULE}.get_static_content", mock_get_static):
             url = upload_processor.upload_image_to_assets(COURSE_ID_STR, MINIMAL_PNG_DATA_URL, BADGE_ID)
 
-        assert url == f"{LMS_ROOT}{ASSET_PATH}"
+        assert url.startswith(f"{LMS_ROOT}{ASSET_PATH}?v=")
         uploaded_file = mock_upload.call_args[0][1]
         assert uploaded_file.read() == base64.b64decode(MINIMAL_PNG_B64)
 

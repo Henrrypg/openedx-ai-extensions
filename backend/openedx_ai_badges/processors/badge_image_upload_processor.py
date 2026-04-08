@@ -5,6 +5,7 @@ Processor to upload a badge image from base64 to Open edX course assets.
 import base64
 import io
 import logging
+import time
 from urllib.parse import urljoin
 
 from django.conf import settings
@@ -72,4 +73,5 @@ class BadgeImageUploadProcessor:
         StaticContent = get_static_content()
         asset_url = StaticContent.serialize_asset_key_with_slash(content.location)
         lms_root = getattr(settings, "LMS_ROOT_URL", "")
-        return urljoin(lms_root, asset_url)
+        base = urljoin(lms_root, asset_url)
+        return f"{base}?v={int(time.time())}"
