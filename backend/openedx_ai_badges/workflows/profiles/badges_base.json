@@ -10,8 +10,9 @@
           "provider": "openai",
       },
       "SkillsProcessor": {
+          // "function": "generate_skills_laiser_api",  // make sure to configure the api key and remove the provider
           "function": "generate_skills",
-          "provider": "openai",
+          "provider": "openai"
       }
   },
   "actuator_config": {

@@ -263,7 +263,8 @@ class BadgeOrchestrator(SessionBasedOrchestrator):
         }
 
         if skills_requested:
-            self._set_status_message("Generating skills alignment...")
+            skills_fn = self.profile.processor_config.get("SkillsProcessor", {}).get("function", "generate_skills")
+            self._set_status_message(f'Generating skills alignment using "{skills_fn}"...')
             skills = self._get_skills(course_context, input_data, regenerate=True)
             if isinstance(skills, dict) and 'error' in skills:
                 return skills
@@ -471,7 +472,8 @@ class BadgeOrchestrator(SessionBasedOrchestrator):
         }
 
         if skills_enabled:
-            self._set_status_message("Generating skills alignment...")
+            skills_fn = self.profile.processor_config.get("SkillsProcessor", {}).get("function", "generate_skills")
+            self._set_status_message(f'Generating skills alignment using "{skills_fn}"...')
             skills = self._get_skills(course_context, input_data)
             if isinstance(skills, dict) and 'error' in skills:
                 return skills

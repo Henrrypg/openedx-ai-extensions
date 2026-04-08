@@ -42,3 +42,20 @@ def plugin_settings(settings):
         settings.OPENEDX_AI_BADGES_MAX_IMAGE_SIZE_BYTES = settings.ENV_TOKENS.get(
             "OPENEDX_AI_BADGES_MAX_IMAGE_SIZE_BYTES", settings.OPENEDX_AI_BADGES_MAX_IMAGE_SIZE_BYTES
         )
+
+    # -------------------------
+    # LAiSER API
+    # -------------------------
+    if hasattr(settings, "ENV_TOKENS"):
+        settings.LAISER_API_BASE_URL = settings.ENV_TOKENS.get(
+            "LAISER_API_BASE_URL", settings.LAISER_API_BASE_URL
+        )
+        settings.LAISER_API_KEY = settings.ENV_TOKENS.get(
+            "LAISER_API_KEY", settings.LAISER_API_KEY
+        )
+        settings.LAISER_API_TIMEOUT_SECONDS = settings.ENV_TOKENS.get(
+            "LAISER_API_TIMEOUT_SECONDS", settings.LAISER_API_TIMEOUT_SECONDS
+        )
+        settings.LAISER_API_POLL_INTERVAL_SECONDS = settings.ENV_TOKENS.get(
+            "LAISER_API_POLL_INTERVAL_SECONDS", settings.LAISER_API_POLL_INTERVAL_SECONDS
+        )
