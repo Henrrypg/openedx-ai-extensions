@@ -100,6 +100,7 @@ class SkillsProcessor(BaseBadgeLLMProcessor):
         prompt = self.fill_prompt(prompt)
         result = self._call_completion_wrapper(system_role=prompt)
         return result
+
     def generate_skills_laiser_api(self):
         """
         Submit course context to the LAiSER API and poll for extracted skills.
@@ -110,14 +111,10 @@ class SkillsProcessor(BaseBadgeLLMProcessor):
         """
         base_url = self.config.get("base_url") or getattr(settings, "LAISER_API_BASE_URL", "")
         api_key = self.config.get("api_key") or getattr(settings, "LAISER_API_KEY", "")
-        timeout = self.config.get("timeout_seconds", getattr(settings, "LAISER_API_TIMEOUT_SECONDS", 90))
-        poll_interval = self.config.get(
-            "poll_interval_seconds", getattr(settings, "LAISER_API_POLL_INTERVAL_SECONDS", 2)
-        )
 
         if not base_url or not api_key:
             logger.error("LAiSER API is not configured. Check LAISER_API_BASE_URL or LAISER_API_KEY")
-            return {"error": f"LAiSER API incorrectly configured"}
+            return {"error": "LAiSER API incorrectly configured"}
 
         try:
             submit_response = requests.post(
@@ -140,15 +137,17 @@ class SkillsProcessor(BaseBadgeLLMProcessor):
             logger.error("LAiSER API submit response missing jobId: %s", submit_data)
             return {"error": "No jobId in LAiSER submit response"}
 
-        result = self._poll_laiser_job(base_url, api_key, job_id, timeout, poll_interval)
+        result = self._poll_laiser_job(base_url, api_key, job_id)
         if "error" in result:
             return result
 
         skills = [self._normalize_laiser_skill(s) for s in result.get("result", [])]
         return {"response": json.dumps({"skills": skills}), "status": "success"}
 
-    def _poll_laiser_job(self, base_url, api_key, job_id, timeout, poll_interval):
+    def _poll_laiser_job(self, base_url, api_key, job_id):
         """Poll GET /result until the job reaches a terminal state or timeout."""
+        timeout = getattr(settings, "LAISER_API_TIMEOUT_SECONDS", 90)
+        poll_interval = getattr(settings, "LAISER_API_POLL_INTERVAL_SECONDS", 2)
         elapsed = 0
         while elapsed < timeout:
             time.sleep(poll_interval)
