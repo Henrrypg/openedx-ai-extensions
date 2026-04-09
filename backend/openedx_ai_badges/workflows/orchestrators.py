@@ -696,6 +696,18 @@ class MITDCCBadgeOrchestrator(BadgeOrchestrator):
             }
         }
 
+    def _add_badge_from_complete_info(self, complete_info):
+        """Create a draft badge entry from a completed generation result and append it to the badges list."""
+        badge = {
+            'id': str(uuid.uuid4()),
+            'status': 'draft',
+            'created_at': datetime.now(timezone.utc).isoformat(),
+            'versions': [],
+            **complete_info,
+        }
+        self._get_badges().append(badge)
+        return badge
+
     def run(self, input_data):
         """
         Execute badge generation via the MIT DCC remote API.
