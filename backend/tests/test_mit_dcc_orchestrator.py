@@ -90,13 +90,7 @@ def test_generate_image_success(mock_settings, mock_post):
     # Mock orchestrator and session
     orchestrator = object.__new__(MITDCCBadgeOrchestrator)
     orchestrator.profile = MagicMock()
-    orchestrator.session = MagicMock(metadata={
-        "complete_info": {
-            "generated_response": {
-                "credentialSubject": {"achievement": {"name": "Test"}},
-            }
-        }
-    })
+    orchestrator.session = MagicMock(metadata={})
     orchestrator.location_id = "loc"
     orchestrator.course_id = "course"
     orchestrator.user = MagicMock()

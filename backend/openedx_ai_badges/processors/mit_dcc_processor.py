@@ -92,7 +92,7 @@ class MITDCCProcessor:
         logger.info("MIT DCC request payload: %s", payload)
 
         try:
-            response = requests.post(self.api_url, json=payload, timeout=120)
+            response = requests.post(self.api_url, json=payload, timeout=300)
             logger.info(
                 "MIT DCC API response — status: %s, headers: %s",
                 response.status_code,
@@ -107,7 +107,7 @@ class MITDCCProcessor:
             )
             return {"error": str(exc)}
         except requests.exceptions.Timeout as exc:
-            logger.error("MIT DCC API timed out after 120 s: %s", exc)
+            logger.error("MIT DCC API timed out after 300 s: %s", exc)
             return {"error": str(exc)}
         except requests.exceptions.HTTPError as exc:
             logger.error(
