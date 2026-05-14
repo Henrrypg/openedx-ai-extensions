@@ -31,7 +31,10 @@ export const useApiStatus = (
     queryFn: () => getApiStatus(contextData),
     enabled,
     retry: 2,
-    refetchInterval: (_data, q) => (q.state.status === 'error' ? false : API_STATUS_POLL_MS),
+    refetchInterval: (firstArg, secondArg?) => {
+      const q = secondArg ?? firstArg;
+      return q?.state?.status === 'error' ? false : API_STATUS_POLL_MS;
+    },
   });
 
   const isServicesReady = !query.data
@@ -64,14 +67,15 @@ export const useBadgeGenerate = (
     queryKey: queryKeys.runStatus(contextData),
     queryFn: () => getRunStatus(contextData),
     enabled: mutation.isSuccess && mutation.data?.status === 'processing',
-    refetchInterval: (data, query) => {
-      if (query.state.status === 'error') { return false; }
-      if (!data || data.status === 'processing') { return RUN_STATUS_POLL_MS; }
+    refetchInterval: (firstArg, secondArg?) => {
+      const q = secondArg ?? firstArg;
+      if (q?.state?.status === 'error') { return false; }
+      if (!q?.state?.data || q.state.data.status === 'processing') { return RUN_STATUS_POLL_MS; }
       return false;
     },
   });
 
-  const isGenerating = mutation.isLoading || polling.data?.status === 'processing';
+  const isGenerating = ((mutation as any).isPending ?? (mutation as any).isLoading ?? false) || polling.data?.status === 'processing';
   let generatedBadge: GeneratedBadge | null = null;
   if (polling.data?.status === 'completed') {
     generatedBadge = polling.data.response ?? null;
@@ -135,7 +139,7 @@ export const useImageGenerate = (
     },
   });
 
-  const isGeneratingImage = mutation.isLoading || polling.data?.status === 'processing';
+  const isGeneratingImage = ((mutation as any).isPending ?? (mutation as any).isLoading ?? false) || polling.data?.status === 'processing';
   const generatedImage = polling.data?.status === 'completed' ? polling.data.response ?? null : null;
   const imageStatusMessage = polling.data?.message ?? (isGeneratingImage ? (mutation.data?.message ?? null) : null);
   const imageError = polling.data?.status === 'error' ? polling.data.error ?? 'Image generation failed' : null;
