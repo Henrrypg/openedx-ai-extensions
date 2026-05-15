@@ -133,8 +133,10 @@ export const useImageGenerate = (
     queryKey: queryKeys.imageStatus(contextData),
     queryFn: () => getImageStatus(contextData),
     enabled: mutation.isSuccess && mutation.data?.status === 'processing',
-    refetchInterval: (data) => {
-      if (!data || data.status === 'processing') { return IMAGE_STATUS_POLL_MS; }
+    refetchInterval: (firstArg, secondArg?) => {
+      const q = secondArg ?? firstArg;
+      if (q?.state?.status === 'error') { return false; }
+      if (!q?.state?.data || q.state.data.status === 'processing') { return IMAGE_STATUS_POLL_MS; }
       return false;
     },
   });
