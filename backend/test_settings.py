@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "django_filters",
     "edx_django_utils.plugins",
     "django_extensions",
+    "submissions",
 ]
 
 # Dynamically add plugin apps - only using the LMS context for simplicity
