@@ -11,7 +11,10 @@ AI Badges Generator
    :alt: License
 
 
-**openedx-ai-badges** is a modular extension for the Open edX AI infrastructure. It demonstrates how to build custom AI-driven features—specifically badge generation—by extending core components like **orchestrators, processors, and actuators**. It serves as both a functional tool and a reference implementation for registering custom AI profiles and UI slots.
+**openedx-ai-badges** is a modular extension for the Open edX AI infrastructure. It demonstrates
+how to build custom AI-driven features—specifically badge generation—by extending core components
+like **orchestrators, processors, and actuators**. It serves as both a functional tool and a
+reference implementation for registering custom AI profiles and UI slots.
 
 .. contents::
    :local:
@@ -20,9 +23,13 @@ AI Badges Generator
 Overview
 ********
 
-**openedx-ai-badges** is an AI-powered badge generation tool built as an extension of the `openedx-ai-extensions`_ framework. This project serves as a practical implementation of extending the Open edX AI infrastructure by registering new orchestrators, processors, UI slots, and AI profiles.
+**openedx-ai-badges** is an AI-powered badge generation tool built as an extension of the
+`openedx-ai-extensions`_ framework. This project serves as a practical implementation of extending
+the Open edX AI infrastructure by registering new orchestrators, processors, UI slots, and AI
+profiles.
 
-With this plugin, we demonstrate the modularity of the AI framework by extending orchestrators, processors, and actuators to handle custom badge-related logic.
+With this plugin, we demonstrate the modularity of the AI framework by extending orchestrators,
+processors, and actuators to handle custom badge-related logic.
 
 Current Status
 **************
@@ -30,7 +37,9 @@ Current Status
 .. warning::
    **Experimental** - This plugin is in active development and should not be used in production environments.
 
-This is an exploratory project developed by edunext as part of FC-111 to investigate AI extensibility patterns for the Open edX platform. The plugin serves as a testing ground for AI integration concepts that may inform future development.
+This is an exploratory project developed by edunext as part of FC-111 to investigate AI
+extensibility patterns for the Open edX platform. The plugin serves as a testing ground for AI
+integration concepts that may inform future development.
 
 **What Works:**
 
@@ -64,9 +73,11 @@ Install the plugin in your Open edX environment using the provided tutor plugin:
 Usage
 ******
 
-The **openedx-ai-badges** plugin extends the base AI framework by providing specialized badge-generation workflows. To use it:
+The **openedx-ai-badges** plugin extends the base AI framework by providing specialized
+badge-generation workflows. To use it:
 
-1. **Configure Providers**: Ensure you have configured your AI providers as described in the `AI Extensions Configuration Guide <https://docs.openedx.org/projects/openedx-ai-extensions/en/latest/quickstarts/configuration_guide.html#configuring-providers>`_.
+1. **Configure Providers**: Ensure you have configured your AI providers as described in the
+   `AI Extensions Configuration Guide <https://docs.openedx.org/projects/openedx-ai-extensions/en/latest/quickstarts/configuration_guide.html#configuring-providers>`_.
 
 2. **Setup AI Profile**:
 
@@ -132,7 +143,8 @@ Install the package in editable mode within your tutor environment (In the LMS a
 
 **3. Advanced Setup**
 
-For a detailed guide on developing extensions and handling cross-package dependencies, refer to the `Developer Guide for AI Extensions <https://github.com/openedx/openedx-ai-extensions/pull/83>`_.
+For a detailed guide on developing extensions and handling cross-package dependencies, refer
+to the `Developer Guide for AI Extensions <https://github.com/openedx/openedx-ai-extensions/pull/83>`_.
 
 
 Code Standards
@@ -168,24 +180,32 @@ configuration variables — see
 Architecture Decisions
 ***********************
 
-Significant architectural decisions are documented in ADRs (Architectural Decision Records) located in the ``docs/decisions/`` directory.
+Significant architectural decisions are documented in ADRs (Architectural Decision Records)
+located in the ``docs/decisions/`` directory.
 
 Extending the AI Framework
 ****************************
 
-This plugin serves as a practical demonstration of how to extend the `openedx-ai-extensions`_ infrastructure. Rather than being a standalone tool, it is built to show how the core AI components can be overridden or augmented.
+This plugin serves as a practical demonstration of how to extend the `openedx-ai-extensions`_
+infrastructure. Rather than being a standalone tool, it is built to show how the core AI
+components can be overridden or augmented.
 
 How We Extended the Core
 ==========================
 The project follows the modular design of the base framework, focusing on three specific extension points:
 
-1. **Custom Orchestrators**: We created a badge-specific orchestrator that intercepts the generation request and manages the sequence of operations required for visual asset creation.
-2. **Specialized Processors**: Logic was added to handle "badge-aware" prompts and parse the AI's response into structured data that the Open edX badge system understands.
-3. **Dedicated UI Component**: We implemented a UI component to display and manage the badges within the Open edX interface.
+1. **Custom Orchestrators**: We created a badge-specific orchestrator that intercepts the
+   generation request and manages the sequence of operations required for visual asset creation.
+2. **Specialized Processors**: Logic was added to handle "badge-aware" prompts and parse the AI's
+   response into structured data that the Open edX badge system understands.
+3. **Dedicated UI Component**: We implemented a UI component to display and manage the badges
+   within the Open edX interface.
 
 Architectural Blueprint
 =========================
-To maintain compatibility and ease of development, this repository mirrors the internal structure of the `openedx-ai-extensions`_ core, using the same registration patterns for AI Profiles and UI Slots, and by bundling backend, frontend, and Tutor plugins.
+To maintain compatibility and ease of development, this repository mirrors the internal structure
+of the `openedx-ai-extensions`_ core, using the same registration patterns for AI Profiles and
+UI Slots, and by bundling backend, frontend, and Tutor plugins.
 
 Contributing
 ************
@@ -217,7 +237,8 @@ This project is licensed under the GNU Affero General Public License v3.0 (AGPL-
 Maintainer
 **********
 
-This repository is covered by the Open edX maintainers program and the current maintainers are listed in the `catalog-info.yaml <catalog-info.yaml>`_ file.
+This repository is covered by the Open edX maintainers program and the current maintainers
+are listed in the `catalog-info.yaml <catalog-info.yaml>`_ file.
 
 **Community Support:**
 

@@ -301,5 +301,8 @@ watchfiles==1.1.1
 websockets==16.0
     # via sphinx-autobuild
 
+openedx-ai-extensions @ git+https://github.com/openedx/openedx-ai-extensions.git@main#subdirectory=backend
+    # via -r requirements/test.txt
+
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
