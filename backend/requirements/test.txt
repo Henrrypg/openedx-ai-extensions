@@ -136,5 +136,8 @@ typing-extensions==4.15.0
     #   -r requirements/base.txt
     #   edx-opaque-keys
 
+openedx-ai-extensions @ git+https://github.com/openedx/openedx-ai-extensions.git@main#subdirectory=backend
+    # via -r requirements/test.in
+
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
