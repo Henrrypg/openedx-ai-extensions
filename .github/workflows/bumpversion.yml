@@ -45,7 +45,7 @@ jobs:
         id: cpr
         uses: peter-evans/create-pull-request@98357b18bf14b5342f975ff684046ec3b2a07725 # v8
         with:
-          token: ${{ secrets.AI_EXTENSIONS_GITHUB_TOKEN }}
+          token: ${{ secrets.AI_BADGES_GITHUB_TOKEN }}
           title: "chore: preparing release ${{ steps.tag_version.outputs.version }}"
           commit-message: "chore: preparing release ${{ steps.tag_version.outputs.version }}"
           branch: "bot/${{ steps.tag_version.outputs.tag }}"
